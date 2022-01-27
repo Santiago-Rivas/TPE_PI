@@ -1,5 +1,9 @@
-#include <imdb_frontend.h>
+#include "imdb_frontend.h"
 
+static void printGenres(allGenres * genres);
+static int readGenresFile(FILE * genresFile, allGenres * genres);
+static void allocError();
+static void freeAllGenres(allGenres * genres);
 
 int imdb_frontend_main(char * moviePath, char * genresPath, int yMin, int yMax){
 	FILE * genresFile = fopen(genresPath, "r");
@@ -17,7 +21,7 @@ int imdb_frontend_main(char * moviePath, char * genresPath, int yMin, int yMax){
 
 	allGenres genres;
 
-	gernes.genresName = calloc(1, sizeof(char *) * MAX_GENRES);
+	genres.genresName = calloc(1, sizeof(char *) * MAX_GENRES);
 	if (genres.genresName == NULL){
 		allocError();
 		return FALSE;
@@ -33,6 +37,7 @@ int imdb_frontend_main(char * moviePath, char * genresPath, int yMin, int yMax){
 	check = readGenresFile(genresFile, &genres);
 
 	if (check == FALSE){
+		freeAllGenres(&genres);
 		return FALSE;
 	}
 
@@ -40,12 +45,11 @@ int imdb_frontend_main(char * moviePath, char * genresPath, int yMin, int yMax){
 	
 	// Impresion de datos
 	
-	free(genres);
-	
+	printGenres(&genres);
 	
 	// Liberar memoria reservada
 	freeAllGenres(&genres);
-
+	return TRUE;
 }
 
 static void printGenres(allGenres * genres){
@@ -57,10 +61,12 @@ static void printGenres(allGenres * genres){
 
 static int readGenresFile(FILE * genresFile, allGenres * genres){
 	char * genreName = malloc((GEN_LINE_MAX_CHARS + 1) * sizeof(char));
+	char * safeGenreName;
 	if (genreName == NULL){
 		allocError();
 		return FALSE;
 	}
+	safeGenreName=genreName;
 	genreName = fgets(genreName, GEN_LINE_MAX_CHARS, genresFile);
 
 	genreName = fgets(genreName, GEN_LINE_MAX_CHARS, genresFile);
@@ -70,8 +76,8 @@ static int readGenresFile(FILE * genresFile, allGenres * genres){
 		nameLen = strlen(genreName);
 		genres->genresName[genres->dim] = malloc(sizeof(char) * nameLen + 1);
 		if (genres->genresName[genres->dim] == NULL){
-			freeAllGenres(genres);
 			allocError();
+			free(safeGenreName);
 			return FALSE;
 		}
 
@@ -81,34 +87,38 @@ static int readGenresFile(FILE * genresFile, allGenres * genres){
 		genres->nameLengths[genres->dim] = nameLen;
 		genres->dim += 1;
 		genreName = fgets(genreName, GEN_LINE_MAX_CHARS, genresFile);
-		}
+	}
 
-	char ** genreNameSafe;
-	genreNameSafe = genres->genresName;
 	genres->genresName = realloc(genres->genresName, sizeof(char *) * (genres->dim));
 
-
 	if (genres->genresName == NULL){
-		freeAllGenres(genres);
 		allocError();	
+		free(safeGenreName);
 		return FALSE;
 	}
-	free(genreName);
-
+	
+	free(safeGenreName);
 	return TRUE;
 }
 
-
-
 static void allocError(){
-	fprintf(stderr, "Error de alocamiento");
+	fprintf(stderr, "Error de alocamiento\n");
 }
 
-
-
-static freeAllGenres(allGenres * genres){
-	for (int i = 0 ; i < genres->dim ; i++){
-		free(genres->genresName[i]);		
-		free(genres->nameLengths[i]);
+static void freeGenreNames(char ** nameVec,unsigned int dim){
+	for (int i = 0 ; i < dim ; i++){
+		free(nameVec[i]);		
 	}
+}
+
+static void freeAllGenres(allGenres * genres){
+	if(genres->genresName != NULL){
+		freeGenreNames(genres->genresName,genres->dim);
+		free(genres->genresName);
+	}
+	if (genres->nameLengths != NULL)
+	{
+		free(genres->nameLengths);
+	}
+	
 }
