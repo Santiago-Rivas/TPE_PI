@@ -7,9 +7,8 @@
 #include <string.h>
 #include <ctype.h>  
 #include "imdb_backend_interfaces.h"
+//#include "imdb_backend.h"
 
-#define TRUE 1
-#define FALSE 0
 #define TITLE_LINE_MAX_CHARS 500
 #define GEN_LINE_MAX_CHARS 70
 

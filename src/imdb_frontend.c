@@ -2,7 +2,6 @@
 
 static void printGenres(allGenres * genres);
 static int readGenresFile(FILE * genresFile, allGenres * genres);
-static void allocError();
 static void freeAllGenres(allGenres * genres);
 
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){
@@ -12,8 +11,8 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 		return EXIT_FAILURE;
 	}
 
-	FILE * titleFile = fopen(titlePath, "r");
-	if (titleFile == NULL){	
+	FILE * titlesFile = fopen(titlePath, "r");
+	if (titlesFile == NULL){	
 		fprintf(stderr, "Error: No se logro abrir el archivo de obras\n");
 		fclose(genresFile);
 		return EXIT_FAILURE;
@@ -106,10 +105,6 @@ static int readGenresFile(FILE * genresFile, allGenres * genres){
 	return TRUE;
 }
 
-static void allocError(){
-	fprintf(stderr, "Error de alocamiento\n");
-}
-
 static void freeGenreNames(char ** nameVec,unsigned int dim){
 	for (int i = 0 ; i < dim ; i++){
 		free(nameVec[i]);		
@@ -131,7 +126,7 @@ static void freeAllGenres(allGenres * genres){
 static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * genres, unsigned int yMin, unsigned int yMax){
 
 	char titleData[TITLE_LINE_MAX_CHARS];
-	char * reutrnTitleData;
+	char * returnTitleData;
 	int check;
 
 	returnTitleData = fgets(titleData, TITLE_LINE_MAX_CHARS, titlesFile);
@@ -159,7 +154,7 @@ static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title){
 	int check;
 	unsigned char fieldNum = 0;
 	char * field;
-	char genresField[CSV_LINE_MAX_CHARS];
+	char genresField[TITLE_LINE_MAX_CHARS];
 	field = strtok(titleData, ";");	
 	while (field != NULL){		
 		switch (fieldNum){
@@ -167,7 +162,7 @@ static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title){
 				setTitleType(title, getType(field));
 				break;
 			case PRIMARY_TITLE:
-				check = setTitleName(title, field)
+				check = setTitleName(title, field);
 					if(check == FALSE){
 						allocError();
 						return FALSE;
@@ -190,7 +185,7 @@ static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title){
 				}
 				break;
 			case GENRES:	
-				strcpy(genresFiled, field);	
+				strcpy(genresField, field);	
 				break;		
 			case AVERAGE_RATING:
 				setRanking(title, atof(field));
@@ -209,8 +204,9 @@ static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title){
 
 }
 
-static int getGenres(char * gernesField, titleADT title){
+static int getGenres(char * genresField, titleADT title){
 	char * genreStr;
+	int check;
 	genreStr = strtok(genresField, ",");
 	while(genreStr != NULL){
 		check = addGenre(title, genreStr);
@@ -224,6 +220,7 @@ static int getGenres(char * gernesField, titleADT title){
 
 
 static int getType(char * str){
+	
 	for (int i = 0 ; str[i] != 0 ; i++){
 		str[i] = tolower(str[i]);
 	}
@@ -231,13 +228,13 @@ static int getType(char * str){
 	if (strcmp(str, "movie") == 0){
 		return MOVIE;			
 	}
-	else if (strcmp(typeString, "short") == 0){
+	else if (strcmp(str, "short") == 0){
 		return SHORT;
 	}
-	else if (strcmp(typeString, "tvseries") == 0){
+	else if (strcmp(str, "tvseries") == 0){
 		return TV_SERIES;
 	}
-	else if (strcmp(typeString, "tvminiseries") == 0){
+	else if (strcmp(str, "tvminiseries") == 0){
 		return TV_MINI_SERIES;
 	}
 	else{

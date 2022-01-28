@@ -16,6 +16,9 @@
 #define INVALID_TYPE -1
 #define NO_YEAR_LIMIT -1
 
+#define TRUE 1
+#define FALSE 0
+
 enum titleType {MOVIE = 0, SHORT, TV_SERIES, TV_MINI_SERIES}; 	// Enum con los tipos de titulos que se pueden tener
 
 typedef struct allGenres {		//Estructura con todos los generos
@@ -40,6 +43,9 @@ titleADT newTitle(void);	//Crea una nueva estructura para pasar los datos a back
 // titleCopy copia todos los elementos del segundo titleADT en el primer titleADT
 int titleCopy(titleADT t1, titleADT t2);
 
+
+
+int addGenres(titleADT title, char * genreName);
 // setGenres llena un vector con indices que indican que generos tiene un determinado titulo
 // Recibe:
 // 	titleADT title: Puntero a estructura donde se van a efectuar los cambios necesarios
@@ -164,6 +170,8 @@ float compareRating(titleADT t1, titleADT t2);
 
 // Libera un titleADT
 void freeTitle(titleADT title);
+
+void allocError();
 
 #endif // IMDB_BACKEND_INTERFACES
 

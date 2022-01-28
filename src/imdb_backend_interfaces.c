@@ -8,7 +8,8 @@ typedef struct titleCDT {
 	unsigned int titleLen;		// Longitud del nombre del titulo
 	int startYear;				// Año cuando salio originalmente el titulo
 	int endYear;				// Año en el cual la serie se dejo de publicar (no aplica a peliculas)
-	unsigned int genres[MAX_GENRES]; // Vector que contiene los indices de los generos del titulo en relacion a la estructura allGenres
+	genreList firstGenre;
+	//unsigned int genres[MAX_GENRES]; // Vector que contiene los indices de los generos del titulo en relacion a la estructura allGenres
 	//unsigned int * genres;		
 	unsigned int cantGenres;	// Cantidad de generos que tiene el ti
 	float averageRating;		// RAting del titulo
@@ -107,6 +108,38 @@ int titleCopy(titleADT t1, titleADT t2){
 	return 1;
 }
 
+int addGenres(titleADT title, char * genreName){
+	genreList auxList = title->firstGenre;
+	genreList last;
+	int c;
+	while (auxList != NULL && (c=strcmp(auxList->genre,genreName))<0)
+	{	
+		last=auxList;
+		auxList=auxList->nextGenre;
+	}
+	if(c != 0)
+	{
+		genreList new=malloc(sizeof(genreNode));
+		if(new==NULL)
+		{
+			allocError();
+			return FALSE;
+		}
+		new->genre=malloc(sizeof(char)* (strlen(genreName) + 1));
+		if(new->genre==NULL)
+		{
+			allocError();
+			free(new);
+			return FALSE;
+		}
+		strcpy(new->genre,genreName);
+		new->nextGenre=auxList;
+		last->nextGenre=new;
+	}
+	return TRUE;
+}
+
+/*
 void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 	int dim = 0;
 	int i = 0;
@@ -127,6 +160,7 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 	}
 	title->cantGenres = dim;
 }
+*/
 
 int setTitleName(titleADT title, char * str){
 	int dim = strlen(str);
@@ -197,12 +231,14 @@ unsigned int returnGenCount(titleADT title){
 	return title->cantGenres;
 }
 
+/*
 int returnGenre(titleADT title, unsigned int index){
 	if (index >= title->cantGenres){
 		return INVALID_INDEX;
 	}
 	return title->genres[index];
 }
+*/
 
 int compareTitleNames(titleADT t1, titleADT t2){
 	return strcmp(t1->primaryTitle, t2->primaryTitle);
@@ -224,4 +260,9 @@ void freeTitle(titleADT title){
 	
 	free(title);
 }
+
+void allocError(){
+	fprintf(stderr, "Error de alocamiento\n");
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
