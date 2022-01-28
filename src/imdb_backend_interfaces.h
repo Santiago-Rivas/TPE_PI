@@ -44,8 +44,10 @@ titleADT newTitle(void);	//Crea una nueva estructura para pasar los datos a back
 int titleCopy(titleADT t1, titleADT t2);
 
 
+genreList addGenres(genreList firstGenre, char * genreName, int * flag);
 
-int addGenres(titleADT title, char * genreName);
+void freeList(genreList list);
+
 // setGenres llena un vector con indices que indican que generos tiene un determinado titulo
 // Recibe:
 // 	titleADT title: Puntero a estructura donde se van a efectuar los cambios necesarios

@@ -3,6 +3,7 @@
 static void printGenres(allGenres * genres);
 static int readGenresFile(FILE * genresFile, allGenres * genres);
 static void freeAllGenres(allGenres * genres);
+static int getGenres(char * genresField, genreList firstGenre);
 
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){
 	FILE * genresFile = fopen(genresPath, "r");
@@ -139,10 +140,11 @@ static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * gen
 		return FALSE;
 	}
 	while (returnTitleData != NULL){
-		check = readTitle(titleData, title);
+		genreList titleGenres =NULL;
+		check = readTitle(titleData, title,titleGenres);
 
-		check = processData(queries, genres, title, yMin, yMax);
-
+		check = processData(queries, genres, title, titleGenres, yMin, yMax);
+		freeList(titleGenres);
 		returnTitleData = fgets(titleData, TITLE_LINE_MAX_CHARS, titlesFile);
 	}
 
@@ -150,7 +152,7 @@ static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * gen
 	return TRUE;
 }
 
-static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title){
+static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genreList firstGenre){
 	int check;
 	unsigned char fieldNum = 0;
 	char * field;
@@ -196,20 +198,22 @@ static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title){
 			case ID: case RUNTIME_MINUTES: default:	
 				break;
 		}
-		field++;
+		fieldNum++;
 		field = strtok(NULL, ";");
 	}
-	check = getGenres(genresField, title);
+	check = getGenres(genresField,firstGenre);
 
+	return check;
+	
 
 }
 
-static int getGenres(char * genresField, titleADT title){
+static int getGenres(char * genresField, genreList firstGenre){
 	char * genreStr;
-	int check;
+	int check= TRUE;
 	genreStr = strtok(genresField, ",");
 	while(genreStr != NULL){
-		check = addGenre(title, genreStr);
+		firstGenre = addGenre(firstGenre, genreStr,&check);
 		if (check == FALSE){
 			return FALSE;
 		}

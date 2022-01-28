@@ -8,9 +8,7 @@ typedef struct titleCDT {
 	unsigned int titleLen;		// Longitud del nombre del titulo
 	int startYear;				// Año cuando salio originalmente el titulo
 	int endYear;				// Año en el cual la serie se dejo de publicar (no aplica a peliculas)
-	genreList firstGenre;
-	//unsigned int genres[MAX_GENRES]; // Vector que contiene los indices de los generos del titulo en relacion a la estructura allGenres
-	//unsigned int * genres;		
+	unsigned int genres[MAX_GENRES]; // Vector que contiene los indices de los generos del titulo en relacion a la estructura allGenres		
 	unsigned int cantGenres;	// Cantidad de generos que tiene el ti
 	float averageRating;		// RAting del titulo
 	unsigned int numVotes;		// Cantidad de votos que tiene el titulo
@@ -108,38 +106,44 @@ int titleCopy(titleADT t1, titleADT t2){
 	return 1;
 }
 
-int addGenres(titleADT title, char * genreName){
-	genreList auxList = title->firstGenre;
-	genreList last;
+genreList addGenres(genreList firstGenre, char * genreName, int * flag)
+{
 	int c;
-	while (auxList != NULL && (c=strcmp(auxList->genre,genreName))<0)
-	{	
-		last=auxList;
-		auxList=auxList->nextGenre;
-	}
-	if(c != 0)
-	{
-		genreList new=malloc(sizeof(genreNode));
-		if(new==NULL)
+	if(firstGenre == NULL || (c=strcmp(firstGenre->genre,genreName))>0){
+		genreList new = malloc(sizeof(genreNode));
+		if(new == NULL)
 		{
 			allocError();
-			return FALSE;
+			*flag=FALSE;
+			return firstGenre;
 		}
-		new->genre=malloc(sizeof(char)* (strlen(genreName) + 1));
-		if(new->genre==NULL)
+		new->genre=malloc((strlen(genreName) +1)*sizeof(char));
+		if(new->genre == NULL)
 		{
 			allocError();
+			*flag=0;
 			free(new);
-			return FALSE;
+			return firstGenre;
 		}
 		strcpy(new->genre,genreName);
-		new->nextGenre=auxList;
-		last->nextGenre=new;
+		new->nextGenre=firstGenre;
+		return new;
 	}
-	return TRUE;
+
+	if(c<0)
+	{
+		firstGenre->nextGenre=addGenres(firstGenre->nextGenre,genreName, flag);
+	}
+	return firstGenre;
 }
 
-/*
+void freeList(genreList list){
+	if(list != NULL){
+		freeList(list->nextGenre);
+		free(list);
+	}
+}
+
 void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 	int dim = 0;
 	int i = 0;
@@ -160,7 +164,6 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 	}
 	title->cantGenres = dim;
 }
-*/
 
 int setTitleName(titleADT title, char * str){
 	int dim = strlen(str);
