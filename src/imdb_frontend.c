@@ -4,6 +4,8 @@ static void printGenres(allGenres * genres);
 static int readGenresFile(FILE * genresFile, allGenres * genres);
 static void freeAllGenres(allGenres * genres);
 static int getGenres(char * genresField, genreList firstGenre);
+static void allocError();
+static void toLowerStr(char * str);
 
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){
 	FILE * genresFile = fopen(genresPath, "r");
@@ -41,6 +43,8 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 		return FALSE;
 	}
 
+	fclose(genresFile);
+
 	// Lectura de obras y llamada al backend
 	queriesADT queries = newQueries();
 	if (queries == NULL){
@@ -53,6 +57,8 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 		freeQueries(queries);
 		return FALSE;
 	}
+
+	fclose(titleFIles);
 	// Impresion de datos
 	printGenres(&genres);
 
@@ -90,6 +96,9 @@ static int readGenresFile(FILE * genresFile, allGenres * genres){
 		genres->genresName[genres->dim][--nameLen] = 0;
 
 		genres->nameLengths[genres->dim] = nameLen;
+
+		toLowerStr(genre->genreName);
+
 		genres->dim += 1;
 		returnGenreName = fgets(genreName, GEN_LINE_MAX_CHARS, genresFile);
 	}
@@ -142,8 +151,19 @@ static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * gen
 	while (returnTitleData != NULL){
 		genreList titleGenres =NULL;
 		check = readTitle(titleData, title,titleGenres);
-
-		check = processData(queries, genres, title, titleGenres, yMin, yMax);
+		if (check == FALSE){
+			allocError();
+			freeList(titleGenres);
+			freeTitle(title);				
+			return FALSE;
+		}
+		check = processData(queries, title, titleGenres, genres, yMin, yMax);
+		if (check == FALSE){
+			allocError();
+			freeList(titleGenres);
+			freeTitle(title);				
+			return FALSE;
+		}
 		freeList(titleGenres);
 		returnTitleData = fgets(titleData, TITLE_LINE_MAX_CHARS, titlesFile);
 	}
@@ -166,7 +186,6 @@ static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genre
 			case PRIMARY_TITLE:
 				check = setTitleName(title, field);
 					if(check == FALSE){
-						allocError();
 						return FALSE;
 					}
 				break;
@@ -213,7 +232,8 @@ static int getGenres(char * genresField, genreList firstGenre){
 	int check= TRUE;
 	genreStr = strtok(genresField, ",");
 	while(genreStr != NULL){
-		firstGenre = addGenre(firstGenre, genreStr,&check);
+		toLowerStr(genreStr);
+		firstGenre = addGenre(firstGenre, genreStr, &check);
 		if (check == FALSE){
 			return FALSE;
 		}
@@ -225,9 +245,7 @@ static int getGenres(char * genresField, genreList firstGenre){
 
 static int getType(char * str){
 	
-	for (int i = 0 ; str[i] != 0 ; i++){
-		str[i] = tolower(str[i]);
-	}
+	toLowerStr(str);
 
 	if (strcmp(str, "movie") == 0){
 		return MOVIE;			
@@ -246,4 +264,13 @@ static int getType(char * str){
 	}
 }
 
+static void allocError(){
+	fprintf(stderr, "Error de alocamiento\n");
+}
 
+
+static void toLowerStr(char * str){
+	for (int i = 0 ; str[i] != 0 ; i++){
+		str[i] = tolower(str[i]);
+	}
+}

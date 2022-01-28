@@ -12,6 +12,8 @@ typedef struct titleCDT {
 	unsigned int cantGenres;	// Cantidad de generos que tiene el ti
 	float averageRating;		// RAting del titulo
 	unsigned int numVotes;		// Cantidad de votos que tiene el titulo
+
+	unsigned int isAnimation;
 } titleCDT;
 
 titleADT newTitle(void){
@@ -113,14 +115,12 @@ genreList addGenres(genreList firstGenre, char * genreName, int * flag)
 		genreList new = malloc(sizeof(genreNode));
 		if(new == NULL)
 		{
-			allocError();
 			*flag=FALSE;
 			return firstGenre;
 		}
 		new->genre=malloc((strlen(genreName) +1)*sizeof(char));
 		if(new->genre == NULL)
 		{
-			allocError();
 			*flag=0;
 			free(new);
 			return firstGenre;
@@ -150,8 +150,11 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 	int c;
 	while (dim<MAX_GENRES && i < MAX_GENRES && i<genres->dim && titleGenres != NULL){
 		if ((c = strcmp(genres->genresName[i], titleGenres->genre)) == 0){
+			if (strcmp(titleGenres->genre, "animation") == 0){
+				title->isAnimation = TRUE;
+			}
 			title->genres[dim] = i;
-			(dim)++;
+			dim++;
 			i++;
 			titleGenres = titleGenres->nextGenre;
 		}
@@ -262,10 +265,6 @@ void freeTitle(titleADT title){
 	}
 	
 	free(title);
-}
-
-void allocError(){
-	fprintf(stderr, "Error de alocamiento\n");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////

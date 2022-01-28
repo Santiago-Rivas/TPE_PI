@@ -173,7 +173,5 @@ float compareRating(titleADT t1, titleADT t2);
 // Libera un titleADT
 void freeTitle(titleADT title);
 
-void allocError();
-
 #endif // IMDB_BACKEND_INTERFACES
 
