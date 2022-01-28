@@ -87,7 +87,7 @@ static int checkYearCondition(int startYear, int endYear, int yMin, int yMax);
 static void setQuery1(yearList current, enum titleType type);
 
 // setQuery2 actualiza los datos que pertenecen al query2
-static int setQuery2(yearList current, pElement title);
+static int setQuery2(queriesADT queries, pElement title, int * removeID);
 
 // setQuery3 actualiza los datos que pertenecen al query3
 static int setQuery3(yearList current, pElement title, int * removeID);
@@ -97,9 +97,6 @@ static int setQuery4(queriesADT queries, pElement title, int * removeID);
 
 // setQuery5 actualiza los datos que pertenecen al query5
 static int setQuery5(queriesADT queries, pElement title, int * removeID);
-
-// setQuery6 actualiza los datos que pertenecen al query6
-static int setQuery6(queriesADT queries, pElement title, int * removeID);
 
 
 static titleList findLast(titleList list, int * flag);
@@ -148,7 +145,7 @@ queriesADT newQueries(void){
 	return new;
 }
 
-int processData(queriesADT queries, titleADT title, genresList titleGenres, allGenres validGenres, int yearLowerLimit, int yearUpperLimit){
+int processData(queriesADT queries, titleADT title, genreList titleGenres, allGenres * validGenres, int yearLowerLimit, int yearUpperLimit){
 
 	if (title == NULL) {															// Se introdujo un titulo invalido
 		return TRUE;
@@ -246,18 +243,18 @@ static int updateQueries(queriesADT queries, int yearLowerLimit, int yearUpperLi
 	int replaceID2 = NO_ID;
 
 	if (titleType == MOVIE) {					// El query 3 y el query 4 son en relacion a film unicamente
-		if (title->isAnimation == TRUE && titleVotes >= MIN_VOTES_Q2){
-			check = setQuery2(current, queries->currentElement, &replaceID1); 				// Se analiza el titulo y se actualiza el top ranking del año si es necesario (query 3)
+		if (returnIsAnimation(queries->currentElement->title)== TRUE && titleVotes >= MIN_VOTES_Q2){
+			check = setQuery2(queries, queries->currentElement, &replaceID1); 				// Se analiza el titulo y se actualiza el top ranking del año si es necesario (query 3)
 			if (check == NEW_TITLE_NODE_ERROR) {														// Verifica si hubo algun error de alocamiento de memoria
 				return 0;
 			}
 		}
-		check = setQuery3(queries, queries->currentElement, &replaceID1);			// Se analiza el titulo y se actualiza el top ranking de films
+		check = setQuery3(current, queries->currentElement, &replaceID1);			// Se analiza el titulo y se actualiza el top ranking de films
 		if (check == NEW_TITLE_NODE_ERROR) {													// Verifica si hubo algun error de alocamiento de memoria
 			return 0;
 		}
 	} 																			// El querry 5 y 6 son en relacion a series unciamente entre los años limites especificados
-	else if ((titleType == TV_SERIES || titleType == TV_MINI_SERIES) && checkYearCondition(startYear, endYear, yearLowerLimit, yearUpperLimit) == 1) {
+	else if ((titleType == TV_SERIES || titleType == TV_MINI_SERIES) && checkYearCondition(titleStartYear, titleEndYear, yearLowerLimit, yearUpperLimit) == 1) {
 		if (titleVotes >= MIN_VOTES_Q4){
 			check = setQuery4(queries, queries->currentElement, &replaceID1); 				// Se analiza el titulo y se actualiza el top ranking de series
 			if (check == NEW_TITLE_NODE_ERROR) {														// Verifica si hubo algun error de alocamiento de memoria
@@ -480,7 +477,7 @@ static int setQuery3(yearList currentYear, pElement element, int * removeID){
 	int flag = 0;
 	flag = rankMaker(&currentYear->topRanking, element, currentYear->rankingDim, MAX_TOP_YEAR, compareVotesNames, removeID);
 	if (flag == 1){
-		current->rankingDim += 1;
+		currentYear->rankingDim += 1;
 	}
 	return flag;
 }
@@ -573,16 +570,8 @@ void returnCurrentYearQ1(queriesADT queries, unsigned int * year,unsigned int * 
 //	return (unsigned int **) queries->yearIterator->genCount;								// Se retorn el vecotor donde se guardan los films y series de cada genero del año actual
 //
 
-void returnCurrentYearQ2(queriesADT queries, unsigned int * year, unsigned int * nFilms, unsigned int * nSeries , unsigned int index){
-	if (index >= MAX_GENRES){
-		return;
-	}
-    *year = queries->yearIterator->year;
-    *nFilms = queries->yearIterator->genCount[MOVIES_ROW][index];
-    *nSeries = queries->yearIterator->genCount[SERIES_ROW][index];
-}
 // ITERADORES:
-
+/*
 void toBeginYears(queriesADT queries){
 	queries->yearIterator = queries->firstYear;	
 }
@@ -663,7 +652,7 @@ int nextWorstSeries(queriesADT queries, titleADT title, int *flag){
 	}
 	return 0;
 }
-
+*/
 // freeElement libera el elemento utilizado para guardar los titulos y su informacion
 static void freeElement(pElement element)
 {
@@ -701,7 +690,7 @@ static void freeStorage(pElement * vec,unsigned int dim)
 
 void freeQueries(queriesADT queries){
 	freeYears(queries->firstYear);
-	freeList(queries->topFilms);
+	freeList(queries->topAnimatedFilms);
 	freeList(queries->topSeries);
 	freeList(queries->worstSeries);
 	freeStorage(queries->storeData,queries->storageDim);

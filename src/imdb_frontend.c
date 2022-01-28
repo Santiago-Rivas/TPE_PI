@@ -1,11 +1,13 @@
 #include "imdb_frontend.h"
-
 static void printGenres(allGenres * genres);
 static int readGenresFile(FILE * genresFile, allGenres * genres);
 static void freeAllGenres(allGenres * genres);
 static int getGenres(char * genresField, genreList firstGenre);
 static void allocError();
 static void toLowerStr(char * str);
+static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * genres, unsigned int yMin, unsigned int yMax);
+static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genreList firstGenre);
+static int getType(char * str);
 
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){
 	FILE * genresFile = fopen(genresPath, "r");
@@ -58,7 +60,7 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 		return FALSE;
 	}
 
-	fclose(titleFIles);
+	fclose(titlesFile);
 	// Impresion de datos
 	printGenres(&genres);
 
@@ -97,7 +99,7 @@ static int readGenresFile(FILE * genresFile, allGenres * genres){
 
 		genres->nameLengths[genres->dim] = nameLen;
 
-		toLowerStr(genre->genreName);
+		toLowerStr(genres->genresName[genres->dim]);
 
 		genres->dim += 1;
 		returnGenreName = fgets(genreName, GEN_LINE_MAX_CHARS, genresFile);
@@ -143,7 +145,7 @@ static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * gen
 
 	returnTitleData = fgets(titleData, TITLE_LINE_MAX_CHARS, titlesFile);
 
-	titleADT title = newTitlte();
+	titleADT title = newTitle();
 	if (title == NULL){
 		allocError();
 		return FALSE;
@@ -153,18 +155,18 @@ static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * gen
 		check = readTitle(titleData, title,titleGenres);
 		if (check == FALSE){
 			allocError();
-			freeList(titleGenres);
+			freeGenreList(titleGenres);
 			freeTitle(title);				
 			return FALSE;
 		}
 		check = processData(queries, title, titleGenres, genres, yMin, yMax);
 		if (check == FALSE){
 			allocError();
-			freeList(titleGenres);
+			freeGenreList(titleGenres);
 			freeTitle(title);				
 			return FALSE;
 		}
-		freeList(titleGenres);
+		freeGenreList(titleGenres);
 		returnTitleData = fgets(titleData, TITLE_LINE_MAX_CHARS, titlesFile);
 	}
 
@@ -233,7 +235,7 @@ static int getGenres(char * genresField, genreList firstGenre){
 	genreStr = strtok(genresField, ",");
 	while(genreStr != NULL){
 		toLowerStr(genreStr);
-		firstGenre = addGenre(firstGenre, genreStr, &check);
+		firstGenre = addGenres(firstGenre, genreStr, &check);
 		if (check == FALSE){
 			return FALSE;
 		}

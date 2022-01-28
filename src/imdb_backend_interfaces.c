@@ -137,9 +137,9 @@ genreList addGenres(genreList firstGenre, char * genreName, int * flag)
 	return firstGenre;
 }
 
-void freeList(genreList list){
+void freeGenreList(genreList list){
 	if(list != NULL){
-		freeList(list->nextGenre);
+		freeGenreList(list->nextGenre);
 		free(list);
 	}
 }
@@ -237,14 +237,17 @@ unsigned int returnGenCount(titleADT title){
 	return title->cantGenres;
 }
 
-/*
+unsigned int returnIsAnimation(titleADT title){
+	return title->isAnimation;
+}
+
 int returnGenre(titleADT title, unsigned int index){
 	if (index >= title->cantGenres){
 		return INVALID_INDEX;
 	}
 	return title->genres[index];
 }
-*/
+
 
 int compareTitleNames(titleADT t1, titleADT t2){
 	return strcmp(t1->primaryTitle, t2->primaryTitle);

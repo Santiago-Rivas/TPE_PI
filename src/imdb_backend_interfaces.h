@@ -46,7 +46,7 @@ int titleCopy(titleADT t1, titleADT t2);
 
 genreList addGenres(genreList firstGenre, char * genreName, int * flag);
 
-void freeList(genreList list);
+void freeGenreList(genreList list);
 
 // setGenres llena un vector con indices que indican que generos tiene un determinado titulo
 // Recibe:
@@ -145,6 +145,8 @@ unsigned int returnGenCount(titleADT title);
 // 	dimension del arreglo si salio todo bien
 // 	COPY_GEN_VEC_ERROR si algo salio mal
 int returnGenre(titleADT title, unsigned int index);
+
+unsigned int returnIsAnimation(titleADT title);
 
 // Funcion de comparacion de nombre de titulos
 // Recibe:

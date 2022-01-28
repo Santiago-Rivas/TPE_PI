@@ -35,7 +35,7 @@ queriesADT newQueries();
 // title: Un puntero al ADT de la obra
 // yearLowerLimit: Representa el año minimo (para los queries 5 y 6)
 // yearLowerLimit: Representa el año máximo (para los queries 5 y 6)
-int processData(queriesADT queries, titleADT title, genresList titleGenres, allGenres validGenres, int yearLowerLimit, int yearUpperLimit);
+int processData(queriesADT queries, titleADT title, genreList titleGenres, allGenres * validGenres, int yearLowerLimit, int yearUpperLimit);
 
 // ITERADORES:
 
