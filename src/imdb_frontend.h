@@ -17,7 +17,9 @@
 #define NO_ELEM_STR1 "\\n"
 #define NO_ELEM_STR2 "\\N"
 
-#define QUERY_NUMBER 5
+#define TOTAL_QUERY_NUMBER 5
+
+enum queries {Q1 = 0,Q2,Q3,Q4,Q5};
 
 #define RETURN_FILE_NAMES {"query1.csv",\
 	"query2.csv", \

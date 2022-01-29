@@ -68,6 +68,14 @@ void toBeginWorstSeries(queriesADT queries);
 // Un 1 si hay un próximo elemento, 0 si no hay
 int hasNextYear(queriesADT queries);
 
+int hasNextYearRanking(queriesADT queries);
+
+int hasNextTopAnimatedFilms(queriesADT queries);
+
+int hasNextTopSeries(queriesADT queries);
+
+int hasNextWorstSeries(queriesADT queries);
+
 // Iterador de años.
 // nextYear devuelve si hay un proximo año
 // Recibe:
@@ -123,17 +131,6 @@ int nextWorstSeries(queriesADT queries, titleADT title,int * flag);
 // nShorts: Variable de entrada/salida donde se guarda la cantidad de cortos en el año al que apunta el iterador
 void returnCurrentYearQ1(queriesADT queries,unsigned int * year, unsigned int * nFilms, unsigned int * nSeries, unsigned int * nShorts);
 
-
-// Funcion de retorno para el query 2
-// returnCurrentYearQ2 retorna la cantidad de peliculas/series que hay de cada genero en el año al que apunta el iterador
-// Recibe:
-// queries:Un puntero a la estructura donde se almacena toda la información necesaria para las queries
-// year: Es el año al que apunta el iterador de años
-// type: Reprenta el tipo, si es serie, pelicula, corto
-// index: Es la posicion en el arreglo de generos, donde cada posicion se corresponde con un genero diferente
-// Devuelve:
-// Un entero que representa la cantidad de peliculas/series que hay de cada genero en el año al que apunta el iterador 
-void returnCurrentYearQ2(queriesADT queries, unsigned int * year, unsigned int * nFilms, unsigned int * nSeries , unsigned int index);
 
 // freeQueries libera todos los datos almacenados dentro de la estructura queries
 // Recibe: 

@@ -594,6 +594,26 @@ static int hasNext(titleList nTitle){
 	return nTitle != NULL;
 }
 
+int hasNextYearRanking(queriesADT queries){
+
+	return hasNext(queries->yearRankingIter);
+}
+
+int hasNextTopAnimatedFilms(queriesADT queries){
+
+	return hasNext(queries->topAnimatedFilmsIterator);
+}
+
+int hasNextTopSeries(queriesADT queries){
+
+	return hasNext(queries->topSeriesIterator);
+}
+
+int hasNextWorstSeries(queriesADT queries){
+
+	return hasNext(queries->worstSeriesIterator);
+}
+
 static int nextItem(titleList * nTitle,titleADT title){
 	int check = titleCopy(title,(*nTitle)->element->title);
 	(*nTitle) = (*nTitle)->nextTitle;

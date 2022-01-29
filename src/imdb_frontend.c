@@ -297,19 +297,123 @@ static void toLowerStr(char * str){
 
 
 static int writeData(queriesADT queries, allGenres * genres){
-	FILE * fileId[QUERY_NUMBER] = {NULL};
-	char ** returnFileNames = RETURN_FILE_NAMES;
-
-	for (int i = 0 ; i < QUERY_NUMBER ; i++){
-		fileId[i] = fopen(returnFileNames[i], "wt");
+	FILE * fileId[TOTAL_QUERY_NUMBER] = {NULL};
+	titleADT title = newTitle();
+	if (title==NULL)
+	{
+		allocError();
+		return FALSE;
 	}
 	
-	printYearlyQueries(queries, genres);
+	char ** returnFileNames = RETURN_FILE_NAMES;
+	char ** returnFileHeaders = RETURN_FILE_HEADERS;
+	int check;
 
-	printQuery2(queries, genres);
-	printQuery4(queries);
-	printQuery5(queries, genres);
+	for (int i = 0 ; i < TOTAL_QUERY_NUMBER ; i++){
+		fileId[i] = fopen(returnFileNames[i], "wt");
+		if(fileId[i] != NULL){
+			fprintf(fileId[i],"%s\n",returnFileHeaders[i]);
+		}
+		else{
+			fprintf(stderr,"Error: No se logró crear alguno de los archivos de retorno\n");
+		}
+	}
+	
+	check = printYearlyQueries(fileId[Q1], fileId[Q3], queries, genres,title);
+	if (check == FALSE)
+	{
+		allocError();
+		return FALSE;
+	}
+	check = printQuery2(queries, genres,title);
+	if (check == FALSE)
+	{
+		allocError();
+		return FALSE;
+	}
+	check = printQuery4(queries,title);
+	if (check == FALSE)
+	{
+		allocError();
+		return FALSE;
+	}
+	check = printQuery5(queries, genres, title);
+	if (check == FALSE)
+	{
+		allocError();
+		return FALSE;
+	}
+
+	freeTitle(title);
 
 }
 
 
+static int printYearlyQueries(FILE * query1, FILE * query3, queriesADT queries, allGenres * genres,titleADT title)
+{
+	if(query1==NULL && query3==NULL)
+	{
+		return TRUE;
+	}
+	toBeginYears(queries);
+	int hasYear=hasNextYear(queries);
+	int check;
+	while(hasYear){
+		if(query1 != NULL)
+		{
+			printQuery1(query1, queries);
+		}
+		if(query3 != NULL)
+		{
+			check=printQuery3(query3, queries, genres, title);
+			if(check == FALSE){
+				return FALSE;
+			}
+		}
+		hasYear=nextYear(queries);
+	}
+
+	return TRUE;
+}
+
+static void printQuery1(FILE * query1, queriesADT queries)
+{
+	int year,nFilms,nSeries,nShorts;
+	returnCurrentYearQ1(queries,&year,&nFilms,&nSeries,&nShorts);
+	fprintf(query1,"%d;%d;%d;%d\n",year,nFilms,nSeries,nShorts);
+}
+
+static int printQuery3(FILE * query3, queriesADT queries, allGenres * genres, titleADT title)
+{
+	toBeginYearRankings(queries);
+	int errorFlag=1;
+	int hasNext=hasNextYearRanking(queries);
+	while(hasNext)
+	{
+		hasNext=nextYearRanking(queries,title,&errorFlag);
+		if(errorFlag == FALSE)
+		{
+			return FALSE;
+		}
+		errorFlag = printTitle(query3,title);
+		if(errorFlag == FALSE)
+		{
+			return FALSE;
+		}
+	}
+	
+}
+
+int printTitle(FILE * query,titleADT title)
+{
+	char * str = NULL;
+	int check;
+	check = returnTitleName(title,&str);
+	if(check == FALSE)
+	{
+		return FALSE;
+	}
+	fprintf(query,"%s",str);
+	free(str);
+	return TRUE;
+}
