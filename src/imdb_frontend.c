@@ -2,11 +2,11 @@
 static void printGenres(allGenres * genres);
 static int readGenresFile(FILE * genresFile, allGenres * genres);
 static void freeAllGenres(allGenres * genres);
-static int getGenres(char * genresField, genreList firstGenre);
+static int getGenres(char * genresField, genreList * firstGenre);
 static void allocError();
 static void toLowerStr(char * str);
 static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * genres, unsigned int yMin, unsigned int yMax);
-static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genreList firstGenre);
+static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genreList * firstGenre);
 static int getType(char * str);
 
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){
@@ -150,9 +150,10 @@ static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * gen
 		allocError();
 		return FALSE;
 	}
+	//int i=0;
 	while (returnTitleData != NULL){
 		genreList titleGenres =NULL;
-		check = readTitle(titleData, title,titleGenres);
+		check = readTitle(titleData, title,&titleGenres);
 		if (check == FALSE){
 			allocError();
 			freeGenreList(titleGenres);
@@ -166,15 +167,16 @@ static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * gen
 			freeTitle(title);				
 			return FALSE;
 		}
+		//i++;
 		freeGenreList(titleGenres);
 		returnTitleData = fgets(titleData, TITLE_LINE_MAX_CHARS, titlesFile);
 	}
-
+	//printf("%d",i);
 	freeTitle(title);
 	return TRUE;
 }
 
-static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genreList firstGenre){
+static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genreList * firstGenre){
 	int check;
 	unsigned char fieldNum = 0;
 	char * field;
@@ -229,13 +231,13 @@ static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genre
 
 }
 
-static int getGenres(char * genresField, genreList firstGenre){
+static int getGenres(char * genresField, genreList * firstGenre){
 	char * genreStr;
 	int check= TRUE;
 	genreStr = strtok(genresField, ",");
 	while(genreStr != NULL){
 		toLowerStr(genreStr);
-		firstGenre = addGenres(firstGenre, genreStr, &check);
+		(*firstGenre) = addGenres(*firstGenre, genreStr, &check);
 		if (check == FALSE){
 			return FALSE;
 		}

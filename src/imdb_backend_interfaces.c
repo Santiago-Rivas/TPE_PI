@@ -140,6 +140,7 @@ genreList addGenres(genreList firstGenre, char * genreName, int * flag)
 void freeGenreList(genreList list){
 	if(list != NULL){
 		freeGenreList(list->nextGenre);
+		free(list->genre);
 		free(list);
 	}
 }

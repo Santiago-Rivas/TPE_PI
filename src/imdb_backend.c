@@ -406,9 +406,13 @@ static titleList updateRank(titleList first, pElement element, int (*compare) (t
 		new->nextTitle = first;
 		new->element->inUse += 1;
 		if (*flag == 1){
+			*flag=0;
 			new->nextTitle = findLast(first, removeID);
 		}
-		*flag = 1; 			// Se agrego un nuevo elemento
+		else
+		{
+			*flag = 1;
+		}
 		return new;
 	}
 	if (c > 0){
@@ -466,9 +470,8 @@ static titleList findLast(titleList list, int * flag){  // Se encuentra el ultim
 static int setQuery2(queriesADT queries, pElement element, int * removeID){
 	int flag = 0;
 	flag = rankMaker(&queries->topAnimatedFilms, element, queries->nTopAnimatedFilms, MAX_TOP_ANIMATED_FILMS, compareRatingVotes, removeID);
-	if (flag == 1){
-		queries->nTopAnimatedFilms += 1;
-	}
+	queries->nTopAnimatedFilms += flag;
+	
 	return flag;
 }
 
@@ -561,17 +564,8 @@ void returnCurrentYearQ1(queriesADT queries, unsigned int * year,unsigned int * 
 	*nShorts = queries->yearIterator->nShorts;												// Retorno de cantidad de shorts ese año
 }
 
-
-// Funcion de retorno para el query 2
-//unsigned int ** returnCurrentYearQ2(queriesADT queries){
-//	if (hasNextYear(queries) == 1){															// Se llego al final. No hay mas años. No modifica a los parametros de entrada y salida
-//		return NULL;
-//	}
-//	return (unsigned int **) queries->yearIterator->genCount;								// Se retorn el vecotor donde se guardan los films y series de cada genero del año actual
-//
-
 // ITERADORES:
-/*
+
 void toBeginYears(queriesADT queries){
 	queries->yearIterator = queries->firstYear;	
 }
@@ -580,8 +574,8 @@ void toBeginYearRankings(queriesADT queries){
 	queries->yearRankingIter = queries->yearIterator->topRanking;
 }
 
-void toBeginTopFilms(queriesADT queries){
-	queries->topFilmsIterator = queries->topFilms;
+void toBeginTopAnimatedFilms(queriesADT queries){
+	queries->topAnimatedFilmsIterator = queries->topAnimatedFilms;
 }
 
 void toBeginTopSeries(queriesADT queries){
@@ -627,9 +621,9 @@ int nextYearRanking(queriesADT queries,titleADT title, int *flag){
 }
 
 // Iterador para las mejores peliculas (query 4)
-int nextTopFilms(queriesADT queries,titleADT title, int *flag){					
-	if (hasNext(queries->topFilmsIterator)){													// Verifica que haya un elemento actual
-		*flag = nextItem(&(queries->topFilmsIterator),title);			
+int nextTopAnimatedFilms(queriesADT queries,titleADT title, int *flag){					
+	if (hasNext(queries->topAnimatedFilmsIterator)){													// Verifica que haya un elemento actual
+		*flag = nextItem(&(queries->topAnimatedFilmsIterator),title);			
 		return *flag;
 	}
 	return 0;																		// Si no quedan mas elementos en el ranking retorn NULL
@@ -652,12 +646,14 @@ int nextWorstSeries(queriesADT queries, titleADT title, int *flag){
 	}
 	return 0;
 }
-*/
+
 // freeElement libera el elemento utilizado para guardar los titulos y su informacion
 static void freeElement(pElement element)
 {
-	freeTitle(element->title);						// Libera el titulo
-	free(element);									// Libera la esttructura
+	if(element != NULL){
+		freeTitle(element->title);						// Libera el titulo
+		free(element);									// Libera la esttructura
+	}
 }
 
 // freeList libera las listas utilizadas para los ranking
@@ -694,6 +690,7 @@ void freeQueries(queriesADT queries){
 	freeList(queries->topSeries);
 	freeList(queries->worstSeries);
 	freeStorage(queries->storeData,queries->storageDim);
+	freeElement(queries->currentElement);
 	free(queries);
 }
 
