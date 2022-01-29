@@ -1,12 +1,23 @@
 #include "imdb_frontend.h"
+
+#define PRINT_SEPARATOR(FILE) fprintf(FILE, SEPARATOR);
+
 static void printGenres(allGenres * genres);
+
 static int readGenresFile(FILE * genresFile, allGenres * genres);
+
 static void freeAllGenres(allGenres * genres);
+
 static int getGenres(char * genresField, genreList * firstGenre);
+
 static void allocError();
+
 static void toLowerStr(char * str);
+
 static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * genres, unsigned int yMin, unsigned int yMax);
+
 static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genreList * firstGenre);
+
 static int getType(char * str);
 
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){
@@ -62,6 +73,10 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 
 	fclose(titlesFile);
 	// Impresion de datos
+	
+	check = writeData(queries, &genres);
+
+
 	printGenres(&genres);
 
 	// Liberar memoria reservada
@@ -264,7 +279,7 @@ static int getType(char * str){
 		return TV_MINI_SERIES;
 	}
 	else{
-		return -1;							//Si la obra no coincide con ningun tipo, se devuelve -1
+		return NO_VALID_TYPE;							//Si la obra no coincide con ningun tipo, se devuelve -1
 	}
 }
 
@@ -278,3 +293,23 @@ static void toLowerStr(char * str){
 		str[i] = tolower(str[i]);
 	}
 }
+
+
+
+static int writeData(queriesADT queries, allGenres * genres){
+	FILE * fileId[QUERY_NUMBER] = {NULL};
+	char ** returnFileNames = RETURN_FILE_NAMES;
+
+	for (int i = 0 ; i < QUERY_NUMBER ; i++){
+		fileId[i] = fopen(returnFileNames[i], "wt");
+	}
+	
+	printYearlyQueries(queries, genres);
+
+	printQuery2(queries, genres);
+	printQuery4(queries);
+	printQuery5(queries, genres);
+
+}
+
+

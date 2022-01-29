@@ -8,6 +8,7 @@
 #define BLOCK 5
 #define ADD_GENRE_ERROR -1  // Error cuando se agregan los generos a un titulo
 #define NO_YEAR -1			// Constante que se usa cuando no se especifica un año
+#define NO_VALID_TYPE -1
 #define DUPLICATE_TITLE_ERROR -1
 #define NEW_TITLE_NODE_ERROR -1
 #define COPY_GEN_VEC_ERROR -1
