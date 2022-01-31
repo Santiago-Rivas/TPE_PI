@@ -2,7 +2,9 @@
 
 #define PRINT_SEPARATOR(FILE) fprintf(FILE, SEPARATOR);
 
-static void printGenres(allGenres * genres);
+#define PRINT_ENTER(FILE) fprintf(FILE, "\n");
+
+//static void printGenres(allGenres * genres);
 
 static int readGenresFile(FILE * genresFile, allGenres * genres);
 
@@ -19,6 +21,35 @@ static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * gen
 static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genreList * firstGenre);
 
 static int getType(char * str);
+
+static int writeData(queriesADT queries, allGenres * genres);
+
+static int printYearlyQueries(FILE * query1, FILE * query3, queriesADT queries, allGenres * genres,titleADT title);
+
+static void printQuery1(FILE * query1, queriesADT queries);
+
+static int printQuery2(FILE * query2, queriesADT queries, allGenres * genres, titleADT title);
+
+static int printQuery3(FILE * query3, queriesADT queries, allGenres * genres, titleADT title);
+
+static int printQuery4(FILE * query4, queriesADT queries, titleADT title);
+
+static int printQuery5(FILE * query5, queriesADT queries, allGenres * genres, titleADT title);
+
+
+static int printTitle(FILE * query,titleADT title);
+
+static void printStartYear(FILE * query, titleADT title);
+
+static void printEndYear(FILE * query, titleADT title);
+
+static void printVotes(FILE * query, titleADT title);
+
+static void printRating(FILE * query, titleADT title);
+
+static void printGenres(FILE * query, titleADT title, allGenres * genres);
+
+
 
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){
 	FILE * genresFile = fopen(genresPath, "r");
@@ -77,21 +108,21 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 	check = writeData(queries, &genres);
 
 
-	printGenres(&genres);
+	//printGenres(&genres);
 
 	// Liberar memoria reservada
 	freeAllGenres(&genres);
 	freeQueries(queries);
 	return TRUE;
 }
-
+/*
 static void printGenres(allGenres * genres){
 	for (int i = 0; i < genres->dim ; i++){
 		printf("%s\n", genres->genresName[i]);
 	}
 
 }
-
+*/
 static int readGenresFile(FILE * genresFile, allGenres * genres){
 	char * returnGenreName;
 	char genreName[GEN_LINE_MAX_CHARS];
@@ -305,8 +336,8 @@ static int writeData(queriesADT queries, allGenres * genres){
 		return FALSE;
 	}
 	
-	char ** returnFileNames = RETURN_FILE_NAMES;
-	char ** returnFileHeaders = RETURN_FILE_HEADERS;
+	char * returnFileNames[TOTAL_QUERY_NUMBER] = RETURN_FILE_NAMES;
+	char * returnFileHeaders[TOTAL_QUERY_NUMBER] = RETURN_FILE_HEADERS;
 	int check;
 
 	for (int i = 0 ; i < TOTAL_QUERY_NUMBER ; i++){
@@ -325,19 +356,19 @@ static int writeData(queriesADT queries, allGenres * genres){
 		allocError();
 		return FALSE;
 	}
-	check = printQuery2(queries, genres,title);
+	check = printQuery2(fileId[Q2] ,queries, genres,title);
 	if (check == FALSE)
 	{
 		allocError();
 		return FALSE;
 	}
-	check = printQuery4(queries,title);
+	check = printQuery4(fileId[Q4], queries,title);
 	if (check == FALSE)
 	{
 		allocError();
 		return FALSE;
 	}
-	check = printQuery5(queries, genres, title);
+	check = printQuery5(fileId[Q5], queries, genres, title);
 	if (check == FALSE)
 	{
 		allocError();
@@ -345,7 +376,7 @@ static int writeData(queriesADT queries, allGenres * genres){
 	}
 
 	freeTitle(title);
-
+	return TRUE;
 }
 
 
@@ -378,10 +409,42 @@ static int printYearlyQueries(FILE * query1, FILE * query3, queriesADT queries, 
 
 static void printQuery1(FILE * query1, queriesADT queries)
 {
-	int year,nFilms,nSeries,nShorts;
+	unsigned int year,nFilms,nSeries,nShorts;
 	returnCurrentYearQ1(queries,&year,&nFilms,&nSeries,&nShorts);
 	fprintf(query1,"%d;%d;%d;%d\n",year,nFilms,nSeries,nShorts);
 }
+
+static int printQuery2(FILE * query2, queriesADT queries, allGenres * genres, titleADT title)
+{
+	toBeginTopAnimatedFilms(queries);
+	int errorFlag=1;
+	int hasNext=hasNextTopAnimatedFilms(queries);
+	while(hasNext)
+	{
+		nextTopAnimatedFilms(queries,title,&errorFlag);
+		if(errorFlag == FALSE)
+		{
+			return FALSE;
+		}
+		printStartYear(query2, title);
+		PRINT_SEPARATOR(query2)
+		errorFlag = printTitle(query2,title);
+		if(errorFlag == FALSE)
+		{
+			return FALSE;
+		}
+		PRINT_SEPARATOR(query2)
+		printVotes(query2, title);
+		PRINT_SEPARATOR(query2)
+		printRating(query2, title);
+		PRINT_SEPARATOR(query2)
+		printGenres(query2, title, genres);
+		PRINT_ENTER(query2)	
+		hasNext = hasNextTopAnimatedFilms(queries);
+	}
+	return TRUE;
+}
+
 
 static int printQuery3(FILE * query3, queriesADT queries, allGenres * genres, titleADT title)
 {
@@ -390,21 +453,98 @@ static int printQuery3(FILE * query3, queriesADT queries, allGenres * genres, ti
 	int hasNext=hasNextYearRanking(queries);
 	while(hasNext)
 	{
-		hasNext=nextYearRanking(queries,title,&errorFlag);
+		nextYearRanking(queries,title,&errorFlag);
 		if(errorFlag == FALSE)
 		{
 			return FALSE;
 		}
+		printStartYear(query3, title);
+		PRINT_SEPARATOR(query3)
 		errorFlag = printTitle(query3,title);
 		if(errorFlag == FALSE)
 		{
 			return FALSE;
 		}
+		PRINT_SEPARATOR(query3)
+		printVotes(query3, title);
+		PRINT_SEPARATOR(query3)
+		printRating(query3, title);
+		PRINT_SEPARATOR(query3)
+		printGenres(query3, title, genres);
+		PRINT_ENTER(query3)
+		hasNext = hasNextYearRanking(queries);
 	}
-	
+	return TRUE;
 }
 
-int printTitle(FILE * query,titleADT title)
+
+static int printQuery4(FILE * query4, queriesADT queries, titleADT title)
+{
+	toBeginTopSeries(queries);
+	int errorFlag=1;
+	int hasNext=hasNextTopSeries(queries);
+	while(hasNext)
+	{
+		hasNext=nextTopSeries(queries,title,&errorFlag);
+		if(errorFlag == FALSE)
+		{
+			return FALSE;
+		}
+		printStartYear(query4, title);
+		PRINT_SEPARATOR(query4)
+		printEndYear(query4, title);
+		PRINT_SEPARATOR(query4)
+		errorFlag = printTitle(query4,title);
+		if(errorFlag == FALSE)
+		{
+			return FALSE;
+		}
+		PRINT_SEPARATOR(query4)
+		printVotes(query4, title);
+		PRINT_SEPARATOR(query4)
+		printRating(query4, title);
+		PRINT_ENTER(query4)
+		hasNext = hasNextTopSeries(queries);
+	}
+	return TRUE;
+}
+
+static int printQuery5(FILE * query5, queriesADT queries,allGenres * genres, titleADT title) 
+{
+	toBeginWorstSeries(queries);
+	int errorFlag=1;
+	int hasNext=hasNextWorstSeries(queries);
+	while(hasNext)
+	{
+		hasNext=nextWorstSeries(queries,title,&errorFlag);
+		if(errorFlag == FALSE)
+		{
+			return FALSE;
+		}
+		printStartYear(query5, title);
+		PRINT_SEPARATOR(query5)
+		printEndYear(query5, title);
+		PRINT_SEPARATOR(query5)
+		errorFlag = printTitle(query5, title);
+		if(errorFlag == FALSE)
+		{
+			return FALSE;
+		}
+		PRINT_SEPARATOR(query5)
+		printVotes(query5, title);
+		PRINT_SEPARATOR(query5)
+		printRating(query5, title);
+		PRINT_SEPARATOR(query5);
+		printGenres(query5, title, genres);
+		PRINT_ENTER(query5)
+		hasNext = hasNextWorstSeries(queries);
+	}
+	return TRUE;
+}
+
+
+
+static int printTitle(FILE * query,titleADT title)
 {
 	char * str = NULL;
 	int check;
@@ -417,3 +557,37 @@ int printTitle(FILE * query,titleADT title)
 	free(str);
 	return TRUE;
 }
+
+static void printStartYear(FILE * query, titleADT title){
+	fprintf(query, "%d", returnStartYear(title));
+}
+
+static void printEndYear(FILE * query, titleADT title){
+	int year = returnEndYear(title);
+	if (year == 0){
+		fprintf(query, "\\N");
+	} else{
+		fprintf(query, "%d", year);
+	}
+}
+
+static void printVotes(FILE * query, titleADT title){
+	fprintf(query, "%d", returnVotes(title));
+}
+
+static void printRating(FILE * query, titleADT title){
+	fprintf(query, "%0.1f", returnRating(title));
+}
+
+static void printGenres(FILE * query, titleADT title, allGenres * genres){
+	int dim = returnGenCount(title);
+	int i;
+	for (i = 0 ; i < dim ; i++){
+		fprintf(query, "%s", genres->genresName[i]);
+		if (i != dim - 1){
+			fprintf(query, ",");
+		}
+	}
+}
+
+

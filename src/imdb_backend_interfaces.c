@@ -13,7 +13,7 @@ typedef struct titleCDT {
 	float averageRating;		// RAting del titulo
 	unsigned int numVotes;		// Cantidad de votos que tiene el titulo
 
-	unsigned int isAnimation;
+	int isAnimation;
 } titleCDT;
 
 titleADT newTitle(void){
@@ -105,6 +105,8 @@ int titleCopy(titleADT t1, titleADT t2){
 	t1->numVotes = t2->numVotes;
 	t1->startYear = t2->startYear;
 	t1->endYear = t2->endYear;
+	t1->isAnimation = t2->isAnimation;
+	//printf("%s\n", t1->primaryTitle);
 	return 1;
 }
 
@@ -152,6 +154,7 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 	while (dim<MAX_GENRES && i < MAX_GENRES && i<genres->dim && titleGenres != NULL){
 		if ((c = strcmp(genres->genresName[i], titleGenres->genre)) == 0){
 			if (strcmp(titleGenres->genre, "animation") == 0){
+				//printf("es animacion\n");
 				title->isAnimation = TRUE;
 			}
 			title->genres[dim] = i;

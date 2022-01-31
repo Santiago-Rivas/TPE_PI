@@ -49,7 +49,7 @@ void toBeginYearRankings(queriesADT queries);
 // toBeginTopFilms hace apuntar el iterador de  mejores peliculas a la primer pelicula de la lista.
 // Recibe:
 // queries:Un puntero a la estructura donde se almacena toda la información necesaria para las queries
-void toBeginTopFilms(queriesADT queries);
+void toBeginTopAnimatedFilms(queriesADT queries);
 
 // toBeginTopSeries hace apuntar el iterador de mejores series a la primer serie de la lista.
 // Recibe:
@@ -100,7 +100,7 @@ int nextYearRanking(queriesADT queries, titleADT title, int * flag);
 // title: Un puntero al ADT de la obra
 // Devuelve:
 // Un 1 si lo pudo agregar, 0 si no pudo
-int nextTopFilms(queriesADT queries, titleADT title, int * flag);
+int nextTopAnimatedFilms(queriesADT queries, titleADT title, int * flag);
 
 // Iterador para las mejores series (query 5)
 // nextTopSeries pone en title el elemento al que apunta el iterador de mejores series
