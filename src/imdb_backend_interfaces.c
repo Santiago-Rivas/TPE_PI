@@ -106,7 +106,9 @@ int titleCopy(titleADT t1, titleADT t2){
 	t1->startYear = t2->startYear;
 	t1->endYear = t2->endYear;
 	t1->isAnimation = t2->isAnimation;
-	//printf("%s\n", t1->primaryTitle);
+	printf("%s\n", t1->primaryTitle);
+	printf("%d\n", t1->isAnimation);
+
 	return 1;
 }
 
@@ -154,8 +156,11 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 	while (dim<MAX_GENRES && i < MAX_GENRES && i<genres->dim && titleGenres != NULL){
 		if ((c = strcmp(genres->genresName[i], titleGenres->genre)) == 0){
 			if (strcmp(titleGenres->genre, "animation") == 0){
-				//printf("es animacion\n");
+				printf("es animacion\n");
 				title->isAnimation = TRUE;
+			}
+			else {
+				title->isAnimation = FALSE;
 			}
 			title->genres[dim] = i;
 			dim++;

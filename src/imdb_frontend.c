@@ -47,7 +47,7 @@ static void printVotes(FILE * query, titleADT title);
 
 static void printRating(FILE * query, titleADT title);
 
-static void printGenres(FILE * query, titleADT title, allGenres * genres);
+static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations);
 
 
 
@@ -438,7 +438,7 @@ static int printQuery2(FILE * query2, queriesADT queries, allGenres * genres, ti
 		PRINT_SEPARATOR(query2)
 		printRating(query2, title);
 		PRINT_SEPARATOR(query2)
-		printGenres(query2, title, genres);
+		printGenres(query2, title, genres, FALSE);
 		PRINT_ENTER(query2)	
 		hasNext = hasNextTopAnimatedFilms(queries);
 	}
@@ -470,7 +470,7 @@ static int printQuery3(FILE * query3, queriesADT queries, allGenres * genres, ti
 		PRINT_SEPARATOR(query3)
 		printRating(query3, title);
 		PRINT_SEPARATOR(query3)
-		printGenres(query3, title, genres);
+		printGenres(query3, title, genres, TRUE);
 		PRINT_ENTER(query3)
 		hasNext = hasNextYearRanking(queries);
 	}
@@ -535,7 +535,7 @@ static int printQuery5(FILE * query5, queriesADT queries,allGenres * genres, tit
 		PRINT_SEPARATOR(query5)
 		printRating(query5, title);
 		PRINT_SEPARATOR(query5);
-		printGenres(query5, title, genres);
+		printGenres(query5, title, genres, TRUE);
 		PRINT_ENTER(query5)
 		hasNext = hasNextWorstSeries(queries);
 	}
@@ -564,7 +564,7 @@ static void printStartYear(FILE * query, titleADT title){
 
 static void printEndYear(FILE * query, titleADT title){
 	int year = returnEndYear(title);
-	if (year == 0){
+	if (year <= NO_YEAR){
 		fprintf(query, "\\N");
 	} else{
 		fprintf(query, "%d", year);
@@ -579,14 +579,19 @@ static void printRating(FILE * query, titleADT title){
 	fprintf(query, "%0.1f", returnRating(title));
 }
 
-static void printGenres(FILE * query, titleADT title, allGenres * genres){
+static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations){
 	int dim = returnGenCount(title);
 	int i;
 	for (i = 0 ; i < dim ; i++){
-		fprintf(query, "%s", genres->genresName[i]);
-		if (i != dim - 1){
-			fprintf(query, ",");
+		if (!((printAnimations == FALSE) && (strcmp(genres->genresName[i], "animation") == 0))){
+			if (i != 0){
+				fprintf(query, ",");
+			}
+			fprintf(query, "%s", genres->genresName[i]);
 		}
+		//if (i != dim - 1){
+		//	
+		//}
 	}
 }
 
