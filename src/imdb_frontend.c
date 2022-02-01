@@ -4,8 +4,6 @@
 
 #define PRINT_ENTER(FILE) fprintf(FILE, "\n");
 
-//static void printGenres(allGenres * genres);
-
 static int readGenresFile(FILE * genresFile, allGenres * genres);
 
 static void freeAllGenres(allGenres * genres);
@@ -107,22 +105,12 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 	
 	check = writeData(queries, &genres);
 
-
-	//printGenres(&genres);
-
 	// Liberar memoria reservada
 	freeAllGenres(&genres);
 	freeQueries(queries);
 	return TRUE;
 }
-/*
-static void printGenres(allGenres * genres){
-	for (int i = 0; i < genres->dim ; i++){
-		printf("%s\n", genres->genresName[i]);
-	}
 
-}
-*/
 static int readGenresFile(FILE * genresFile, allGenres * genres){
 	char * returnGenreName;
 	char genreName[GEN_LINE_MAX_CHARS];
@@ -196,7 +184,6 @@ static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * gen
 		allocError();
 		return FALSE;
 	}
-	//int i=0;
 	while (returnTitleData != NULL){
 		genreList titleGenres =NULL;
 		check = readTitle(titleData, title,&titleGenres);
@@ -213,11 +200,9 @@ static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * gen
 			freeTitle(title);				
 			return FALSE;
 		}
-		//i++;
 		freeGenreList(titleGenres);
 		returnTitleData = fgets(titleData, TITLE_LINE_MAX_CHARS, titlesFile);
 	}
-	//printf("%d",i);
 	freeTitle(title);
 	return TRUE;
 }
@@ -589,10 +574,5 @@ static void printGenres(FILE * query, titleADT title, allGenres * genres, int pr
 			}
 			fprintf(query, "%s", genres->genresName[i]);
 		}
-		//if (i != dim - 1){
-		//	
-		//}
 	}
 }
-
-

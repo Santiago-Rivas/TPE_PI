@@ -49,7 +49,6 @@ int main( int argc, char *argv[] )  {
 	}
 
 	check = imdb_frontend_main(argv[1], argv[2], yMin, yMax);
-	printf("%d\n",check);
 	return EXIT_SUCCESS;
 }
 

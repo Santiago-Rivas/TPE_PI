@@ -21,72 +21,6 @@ titleADT newTitle(void){
 	return new;
 }
 
-/*
-static int genresToVec(allGenres * genres, genreList titleGenres, unsigned int ** vec){
-	int dim = 0;
-	int i = 0;
-	int c;
-	while (i < genres->dim && titleGenres != NULL){
-		if ((c = strcmp(genres->genresName[i], titleGenres->genre) == 0)){
-			if (dim % BLOCK == 0){
-				*vec = realloc(*vec, (dim + BLOCK) * sizeof(unsigned int));
-				if (*vec == NULL){
-					return ADD_GENRE_ERROR;
-				}
-			}
-			*vec[dim] = i;
-			(dim)++;
-			i++;
-			titleGenres = titleGenres->nextGenre;
-		}
-		else if (c > 0){
-			titleGenres = titleGenres->nextGenre;
-		}
-		else {
-			i++;
-		}
-	}
-	*vec = realloc(*vec, (dim) * sizeof(unsigned int));
-	return dim;
-}
-*/
-/*
-// La podemos llamar createValidTitle porque crea un titulo que cumple con las condiciones de lo queries
-titleADT createTitle(char * titleName, enum titleType type, char * startYear, char * endYear, allGenres * genres, genreList titleGenres, float rating, int votes, int * flag){
-	if (votes == 0 || strcmp(startYear, "\\N") == 0){			// Verificar la segunda opcion
-		*flag = 1;
-		return NULL;
-	}
-	titleADT new = malloc(sizeof(titleCDT));
-	if (new == NULL){
-		*flag = 0;
-		return NULL;
-	}
-	new->type = type;
-	new->titleLen = strlen(titleName);
-	new->primaryTitle = malloc(new->titleLen + 1);
-	if (new->primaryTitle == NULL){
-		*flag = 0;
-		free(new);
-		return NULL;
-	}
-	strcpy(new->primaryTitle, titleName);
-	new->startYear = atoi(startYear);
-	new->endYear = atoi(endYear);
-
-	int check;
-	new->genres = genresToVec(genres, titleGenres, &check);
-	if (check == ADD_GENRE_ERROR){
-		*flag = 0;
-		free(new);
-		return NULL;
-	}
-	new->cantGenres = check;
-	new->averageRating = rating;
-	new->numVotes = votes;
-    return new;
-}
-*/
 int titleCopy(titleADT t1, titleADT t2){
 	t1->primaryTitle = realloc(t1->primaryTitle, t2->titleLen + 1);
 	if (t1->primaryTitle == NULL){
@@ -106,9 +40,6 @@ int titleCopy(titleADT t1, titleADT t2){
 	t1->startYear = t2->startYear;
 	t1->endYear = t2->endYear;
 	t1->isAnimation = t2->isAnimation;
-	printf("%s\n", t1->primaryTitle);
-	printf("%d\n", t1->isAnimation);
-
 	return 1;
 }
 
@@ -156,7 +87,6 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 	while (dim<MAX_GENRES && i < MAX_GENRES && i<genres->dim && titleGenres != NULL){
 		if ((c = strcmp(genres->genresName[i], titleGenres->genre)) == 0){
 			if (strcmp(titleGenres->genre, "animation") == 0){
-				printf("es animacion\n");
 				title->isAnimation = TRUE;
 			}
 			else {

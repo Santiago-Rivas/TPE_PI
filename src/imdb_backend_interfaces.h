@@ -39,8 +39,6 @@ typedef struct titleCDT * titleADT;	//ADT de obra
 
 titleADT newTitle(void);	//Crea una nueva estructura para pasar los datos a backend
 
-//titleADT createTitle(char * titleName, enum titleType type, char * startYear, char * endYear, allGenres * genres, genreList titleGenres, float rating, int votes, int * flag);
-
 // titleCopy copia todos los elementos del segundo titleADT en el primer titleADT
 int titleCopy(titleADT t1, titleADT t2);
 

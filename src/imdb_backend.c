@@ -231,31 +231,25 @@ static int updateQueries(queriesADT queries, int yearLowerLimit, int yearUpperLi
 	int titleEndYear = returnEndYear(queries->currentElement->title);
 	unsigned int titleType = returnType(queries->currentElement->title);
 	unsigned int titleVotes = returnVotes(queries->currentElement->title);
-
-	printf("%d\n",titleStartYear);
-	printf("%d\n",titleEndYear);
-	printf("%d\n",yearLowerLimit);
-	printf("%d\n",yearUpperLimit);
 	
 	yearList current;															// Puntero al nodo del año al cual el titulo pertenece
 	queries->firstYear = findYear(queries->firstYear, titleStartYear, &current);		// Se encuentra el nodo del año del titulo o se crea uno nuevo si es necesario
 	if (current == NULL) { 														// Si current es NULL significa que hubo un error
 		return 0;
 	}
+
 	setQuery1(current, titleType); 			// Se analiza el titulo y se actualizan los datos del query 1
 	
 	int replaceID1 = NO_ID;
 	int replaceID2 = NO_ID;
-	//printf("ANTES DE IFS\n");
+
 	if (titleType == MOVIE) {					// El query 3 y el query 4 son en relacion a film unicamente
 		if ((returnIsAnimation(queries->currentElement->title) == TRUE) && (titleVotes >= MIN_VOTES_Q2)){
-			printf("						entre Q2\n");
 			check = setQuery2(queries, queries->currentElement, &replaceID1); 				// Se analiza el titulo y se actualiza el top ranking del año si es necesario (query 3)
 			if (check == NEW_TITLE_NODE_ERROR) {														// Verifica si hubo algun error de alocamiento de memoria
 				return 0;
 			}
 		}
-				printf("							entre Q3\n");
 		check = setQuery3(current, queries->currentElement, &replaceID1);			// Se analiza el titulo y se actualiza el top ranking de films
 		if (check == NEW_TITLE_NODE_ERROR) {													// Verifica si hubo algun error de alocamiento de memoria
 			return 0;
@@ -263,14 +257,12 @@ static int updateQueries(queriesADT queries, int yearLowerLimit, int yearUpperLi
 	} 																			// El querry 5 y 6 son en relacion a series unciamente entre los años limites especificados
 	else if ((titleType == TV_SERIES || titleType == TV_MINI_SERIES) && (checkYearCondition(titleStartYear, titleEndYear, yearLowerLimit, yearUpperLimit) == 1)) {
 		if (titleVotes >= MIN_VOTES_Q4){
-			printf("							entre Q4\n");
 			check = setQuery4(queries, queries->currentElement, &replaceID1); 				// Se analiza el titulo y se actualiza el top ranking de series
 			if (check == NEW_TITLE_NODE_ERROR) {														// Verifica si hubo algun error de alocamiento de memoria
 				return 0;
 			}
 		}
 		if (titleVotes >= MIN_VOTES_Q5){
-			printf("							entre Q5\n");
 			check = setQuery5(queries, queries->currentElement, &replaceID2); 				// Se analiza el titulo y se actualiza el worst ranking de series
 			if (check == NEW_TITLE_NODE_ERROR) {														// Verifica si hubo algun error de alocamiento de memoria
 				return 0;
@@ -286,30 +278,23 @@ static int updateQueries(queriesADT queries, int yearLowerLimit, int yearUpperLi
 }
 
 
-// Esta funcion verifica si el titulo cumple las condicion para el query 5 y el query 6
-//
+// Esta funcion verifica si el titulo cae dentro de los años especificados para el query 4 y el query 5
 static int checkYearCondition(int startYear, int endYear, int yMin, int yMax){
 	if (yMin == 0){
-		printf("			ENTRE 1\n");
 		return 1;
 	}
 	if ((yMax == 0) && (startYear >= yMin)){
-		printf("			ENTRE 2\n");
 		return 1;
 	}
 	if ((startYear >= yMin) && (startYear <= yMax)){
-		printf("			ENTRE 3\n");
 		return 1;
 	}
 	if ((endYear != NO_YEAR) && (endYear >= yMin) && (endYear <= yMax)){
-				printf("			ENTRE 4\n");
-
 		return 1;
 	}
 	if ((startYear <= yMax) && (endYear == NO_YEAR)){
 		return 1;
 	}
-	printf("Sali!\n");
 	return 0;
 }
 
@@ -376,51 +361,15 @@ static void setQuery1(yearList current, enum titleType type){
 	}
 }
 
-//static titleList updateRank(titleList first, pElement element, int (*compare) (titleADT t1, titleADT t2), int * flag){
-//	int c;
-//	if (first == NULL || (c = compare(first->element->title, element->title)) <= 0){
-//		titleList new = malloc(sizeof(titleNode));
-//		if (new == NULL){
-//			*flag = NEW_TITLE_NODE_ERROR;
-//			return first;			
-//		}
-//		new->element = element;
-//		new->nextTitle = first;
-//		new->element->inUse += 1;
-//		if (*flag == 1){
-//			if (first == NULL){
-//			    *flag = NO_ID;
-//			    return first;
-//			} else {
-//				new->nextTitle = findLast(first, flag);
-//			}
-//		}
-//		else {
-//			*flag = NO_NEW_NODE;
-//		}
-//		return new;
-//	}
-//	else if (c > 0){
-//		first->nextTitle = updateRank(first->nextTitle, element, compare, flag);
-//	}
-//	else {
-//		*flag = 1;
-//	}
-//	return first;
-//}
-
 static titleList updateRank(titleList first, pElement element, int (*compare) (titleADT t1, titleADT t2), int * flag, int * removeID){
 	int c;
-	printf("1\n");
 	if (first == NULL){
-		printf("2\n");
 		if (*flag == 1){
 			*flag = 0;			// No se agrego ningun elemento
 			return first;
 		}
 	}
 	if (first == NULL || ((c = compare(first->element->title, element->title)) <= 0)){
-		printf("3\n");
 		titleList new = malloc(sizeof(titleNode));
 		if (new == NULL){
 			*flag = NEW_TITLE_NODE_ERROR;
@@ -440,13 +389,8 @@ static titleList updateRank(titleList first, pElement element, int (*compare) (t
 		return new;
 	}
 	if (c > 0){
-		printf("4\n");
 		first->nextTitle = updateRank(first->nextTitle, element, compare, flag, removeID);
 	}
-	//else {
-	//	*flag = 0; 			// Se encontro un elemento repetido, no se hace nada.
-	//}
-	printf("sali\n");
 	return first;
 }
 
@@ -457,26 +401,9 @@ static int rankMaker(titleList * ranking, pElement element, unsigned int dim, in
 	} else {
 		flag = 0;
 	}
-	printf("flag ingreso %d\n", flag);
 	*ranking = updateRank(*ranking, element, compare, &flag, removeID);
 	return flag;
 }
-
-//static titleList findLast(titleList list, int * flag){  // Se encuentra el ultimo elemento del ranking
-//	if (list->nextTitle == NULL){	                    //Caso base: si el siguiente elemento al actual es NULL (no hay)
-//		list->element->inUse -= 1;                      //Se le quita un uso al elemento
-//		if (list->element->inUse == 0){                 //Y si se quedo sin usos
-//			*flag = list->element->id;                  //Hay que eliminarlo
-//		} else {                                        //Si tiene al menos un uso no lo elimino
-//			*flag = NO_ID;
-//		}
-//		free(list);																		// Se libera el nodo
-//		return NULL;																		// Se retorna NULL indicando el nuevo ultimo elemento
-//	}
-//	list->nextTitle = findLast(list->nextTitle, flag);										// No se encuentra el ultimo elemento, se avanza al priximo elemento de la lista
-//	return list;
-//}
-
 
 static titleList findLast(titleList list, int * flag){  // Se encuentra el ultimo elemento del ranking
 	if (list->nextTitle == NULL){	                    //Caso base: si el siguiente elemento al actual es NULL (no hay)
@@ -498,8 +425,6 @@ static int setQuery2(queriesADT queries, pElement element, int * removeID){
 	int flag = 0;
 	flag = rankMaker(&queries->topAnimatedFilms, element, queries->nTopAnimatedFilms, MAX_TOP_ANIMATED_FILMS, compareRatingVotes, removeID);
 	queries->nTopAnimatedFilms += flag;
-	////printf("%d	%d\n", flag, queries->nTopAnimatedFilms);
-	
 	return flag;
 }
 
@@ -568,8 +493,7 @@ static int compareVotesNames(titleADT t1, titleADT t2){
 	}
 }
 
-// Funcion de comparacion para el query 6
-// Notar que es lo opuesto a lo que se quiere en el query 4 y en el query 5
+// Funcion de comparacion para el query 5
 // Retorna:
 // > 0 si t1 < t2
 // < 0 si t1 > t2
