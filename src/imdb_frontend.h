@@ -3,38 +3,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
-#include <ctype.h>  
+#include <ctype.h> 
+
 #include "imdb_backend_interfaces.h"
 #include "imdb_backend.h"
 
-#define SEPARATOR ";"
+#define SEPARATOR ";"				// Separador utilizado en los archivos csv
 
-#define TITLE_LINE_MAX_CHARS 500
-#define GEN_LINE_MAX_CHARS 70
+#define TITLE_LINE_MAX_CHARS 500		// Cantidad maxima de caracteres leidos por linea en la lectura del archivo de titulos
+#define GEN_LINE_MAX_CHARS 70			// Cantidad maxima de caracteres leido por linea en la lectura del archivo de titulos
 
-#define NO_ELEM_STR1 "\\n"
-#define NO_ELEM_STR2 "\\N"
-
-#define TOTAL_QUERY_NUMBER 5
-
-enum queries {Q1 = 0,Q2,Q3,Q4,Q5};
-
-#define RETURN_FILE_NAMES {"query1.csv",\
-	"query2.csv", \
-        "query3.csv", \
-	"query4.csv", \
-	"query5.csv"}
-
-#define RETURN_FILE_HEADERS {"year;films;series;shorts",\
-	"year;films;votes;rating;genres", \
-        "year;films;votes;rating;gernes", \
-	"startYear;endYear;series;votes;rating", \
-	"startYear;endYear;series;votes;rating;genres"}
-
-
-
+// Se le otorga un indice a cada una de la celdas que se van a leer en el archivo de titulos.
 enum fieldOrder {ID = 0,
                 TITLE_TYPE, 
                 PRIMARY_TITLE,
@@ -45,7 +25,39 @@ enum fieldOrder {ID = 0,
                 NUM_VOTES,
                 RUNTIME_MINUTES};
 
-int imdb_frontend_main(char * moviePath, char * genresPath, unsigned int yMin, unsigned int yMax);
+
+// Indicadores de que no hay informacion en la es celda especifica
+#define NO_ELEM_STR1 "\\n"
+#define NO_ELEM_STR2 "\\N"
+
+#define TOTAL_QUERY_NUMBER 5			// Cantidad de queries que se van a evaluar e imprimir en diferentes archivos
+
+enum queries {Q1 = 0,Q2,Q3,Q4,Q5};		// Indice orotgado a cada query
+
+// Nombre de los archivos de retorno
+#define RETURN_FILE_NAMES {"query1.csv",\
+	"query2.csv", \
+        "query3.csv", \
+	"query4.csv", \
+	"query5.csv"}
+
+// Headers para cada uno de los archivos de retorno.
+// Estan ordenados segun el enum.
+#define RETURN_FILE_HEADERS {"year;films;series;shorts",\
+	"year;films;votes;rating;genres", \
+        "year;films;votes;rating;gernes", \
+	"startYear;endYear;series;votes;rating", \
+	"startYear;endYear;series;votes;rating;genres"}
+
+// imdb_frontend_main es una funcion llamada po main
+// Parametros de entrada:
+// 	titlePath: Path del archivo de titulos.
+// 	genresPath: Path del archivo de generos
+
+//	yMin: Año minmo en el cual se consideraran series para el query 4 y 5
+//	yMax: Año maxim en el cual se consideraran series para el query 4 y 5
+//	El año NO_YEAR indica que no se ingreso el parametro cuando se llamo al programa
+int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax);
 
 
 #endif //IMDB_FRONTEND

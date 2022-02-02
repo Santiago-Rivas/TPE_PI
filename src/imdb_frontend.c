@@ -1,10 +1,17 @@
 #include "imdb_frontend.h"
 
+// Macro para automatizar la impresion del sperador en los archivos csv
 #define PRINT_SEPARATOR(FILE) fprintf(FILE, SEPARATOR);
-
+// Macro para automatizar la impresion del "\n" en los archivos csv
 #define PRINT_ENTER(FILE) fprintf(FILE, "\n");
 
+// readGenresFile es una funcion que lee el archivo con los generos. La funcion retorna TRUE si todo salio bien y FALSE si hubo algun error de alocamiento.
+// Parametros de entrada:
+// 	genresFile: Puntero a al archivo de generos.
+// Parametros de salida:
+// 	genres: Estructura que contiene un arreglo con los nombres de los diferentes generos. Tambien guarda la cantidad de generos que hay en total y la longitud de los strings de generos.
 static int readGenresFile(FILE * genresFile, allGenres * genres);
+
 
 static void freeAllGenres(allGenres * genres);
 
@@ -212,7 +219,7 @@ static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genre
 	unsigned char fieldNum = 0;
 	char * field;
 	char genresField[TITLE_LINE_MAX_CHARS];
-	field = strtok(titleData, ";");	
+	field = strtok(titleData, SEPARATOR);	
 	while (field != NULL){		
 		switch (fieldNum){
 			case TITLE_TYPE:	
@@ -253,7 +260,7 @@ static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genre
 				break;
 		}
 		fieldNum++;
-		field = strtok(NULL, ";");
+		field = strtok(NULL, SEPARATOR);
 	}
 	check = getGenres(genresField,firstGenre);
 
@@ -550,7 +557,7 @@ static void printStartYear(FILE * query, titleADT title){
 static void printEndYear(FILE * query, titleADT title){
 	int year = returnEndYear(title);
 	if (year <= NO_YEAR){
-		fprintf(query, "\\N");
+		fprintf(query, NO_ELEM_STR2);
 	} else{
 		fprintf(query, "%d", year);
 	}
@@ -567,12 +574,17 @@ static void printRating(FILE * query, titleADT title){
 static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations){
 	int dim = returnGenCount(title);
 	int i;
+	int addCounter = 0;
 	for (i = 0 ; i < dim ; i++){
 		if (!((printAnimations == FALSE) && (strcmp(genres->genresName[i], "animation") == 0))){
 			if (i != 0){
 				fprintf(query, ",");
 			}
 			fprintf(query, "%s", genres->genresName[i]);
+			addCounter++;
 		}
+	}
+	if (addCounter == 0){	
+		fprintf(query, NO_ELEM_STR2);
 	}
 }

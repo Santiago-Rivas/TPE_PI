@@ -8,25 +8,28 @@
 #define NO_NEW_NODE -3
 
 // Estructura para manipular titulos que se necesitan mantener en memoria dinamica
+// El programa guardara dinamicamente solo los titulos que se necesitan en un arreglo de punteros a tElement
 typedef struct tElement{
-	int id;
-	titleADT title;
-	unsigned char inUse;
+	int id;					// Indice del arreglo en el cual se encuetra almacenado el puntero a tElement
+	titleADT title;				// titleADT que se esta almacenando 
+	unsigned char inUse;			// Indicador de cuantos queries esta utilizando el titulo almacenado. En el caso que sea cero, esto indica que se puede liberar el titulo de la memoria.
 } tElement;
 
-typedef tElement * pElement;
+typedef tElement * pElement;			// Definicion del tipo de dato pElement
 
-typedef struct titleNode * titleList;
+typedef struct titleNode * titleList;		// Definicion del tipo de dato titleList
 
+// Para los queries que piden hacer un ranking se utiliza una lista de pElement
 typedef struct titleNode {
-	pElement element;
-	titleList nextTitle;
+	pElement element;			// pElement que contiene al titulo
+	titleList nextTitle;			// Puntero al proximo elemento de la lista
 } titleNode;
 
-typedef struct yearNode * yearList;
+typedef struct yearNode * yearList;		// Definicion del tipo de dato yearList
 
 // yearNode es una estructura que contiene datos ordenados anualmente.
-// Estos datos se necesitan para el Query 1, Query 2 y Query 3
+// En la estructura principal queriesADT se guarda el primer año de un lista ordenada descendentemente por año
+// Estos datos se necesitan para el Query 1 y query 3
 typedef struct yearNode {
 	int year;
 	// Query 1										// Año de la informacion guardad por el nodo
@@ -65,22 +68,29 @@ typedef struct queriesCDT{
 	unsigned int nWorstSeries;						// Cantidad de elementos en la lista de peores serie
 	
 	pElement currentElement;						// Estructura para manipular titulos que deben interactuar con el frontend
-	pElement * storeData;							// Arreglo de estructuras que guarda los punteros a los elementos utilizados por los ranking
+	pElement * storeData;							// Arreglo que guarda los punteros a los elementos utilizados por los ranking
 	unsigned int storageMax;						// Tamaño maximo de almacenamiento (crece de a bloque)
 	unsigned int storageDim;						// Cantidad de elementos dentro del arreglo
 } queriesCDT;
 
 // Prototipos de funciones static:
 
-
+// newCurrentElement crea un nuevo pElement cuando se necesita. Esto ocurrira en el primer titulo y en la iteracion proxima de que un titulo se utilice en algun querry
+// Recibe la dimension actual del arreeglo storeData para asignarlo como el ID del nuevo currentElement
 static pElement newCurrentElement(unsigned int maxId);
 
+// updateQuerries es una funcion que se engcarga de actualizar los queries
+// La funcion retorna TRUE si todo salio bien y FALSE si hubo algun error de alocamiento de memoria
+// Parametros de entrada y salida:
+// 	queries: ADT que contiene los queries y el currentElement con el titulo que sera analizado
 static int updateQueries(queriesADT queries, int yearLowerLimit, int yearUpperLimit);
 
 
 // findYear encuentra el nodo de una año en partular en una lista de años. Si no lo encuentra, crea un nuevo nodo y lo agrega a la lista
 static yearList findYear(yearList first, int year, yearList * current);
 
+// Funcion que chequea si el titulo esta dentro de los años indicados cuando se llamo al programa.
+// Esto solo se necesita para el query 4 y 5
 static int checkYearCondition(int startYear, int endYear, int yMin, int yMax);
 
 // setQuery1 actualiza los datos que pertenecen al query1
@@ -98,42 +108,114 @@ static int setQuery4(queriesADT queries, pElement title, int * removeID);
 // setQuery5 actualiza los datos que pertenecen al query5
 static int setQuery5(queriesADT queries, pElement title, int * removeID);
 
-
+// findLast es una funcion recursiva que encuentra el ultimo elemento de una lista. La funcoin es llamada solo cuando se agrega una elemento a una lista.
+// Parametros de enrada:
+// 	list: Elemnto proximo al elemento agregado a la lista.
+// Parametros de salida:
+// 	flag: Id del ultimo pElement de la lista. Si el pElement sigue siendo utilizado en otro query (indicado por inUse) la funcion retorna NO_ID
 static titleList findLast(titleList list, int * flag);
+
 
 static titleList updateRank(titleList first, pElement title, int (*compare) (titleADT t1, titleADT t2), int * flag, int * removeID);
 
 static int rankMaker(titleList * ranking, pElement element, unsigned int dim, int max, int (*compare) (titleADT t1, titleADT t2), int * removeID);
 
-
+// addCurrentToStorage agrega el curretnElement del parametro queries al arreglo con todos los pElements que estan en uso
 static int addCurrentToStorage(queriesADT queries);
 
+// removeId es una funcion que libera de memoria el elemento que esta en la arreglo de pElements en el indice indicado por replaceID
 static void removeId(queriesADT queries, int replaceID);
 
+// La funcion updateStorage se encarga de agregar y liberar pElements del arreglo con todos los pEleemnts que se estan utilizando por lo queries
 static int updateStorage(queriesADT queries, int replaceID1, int replaceID2);
 
 
 // Funciones de comparacion
 
+// Esta funcion compara dos titleADT segun su rating. A igualdad de rating se compara el numero de votos.
 static int compareRatingVotes(titleADT t1, titleADT t2);
 
+
+// Esta funcion compara dos titleADT segun su numero de votos. A igualdad de numero de votos se comparan los nombres de los titulos alfabeticamente.
 static int compareVotesNames(titleADT t1, titleADT t2);
 
+// Funcion de comparacion para el query 5. Llama a copmareRatingVotes, pero con los parametros de entrada cambiados de lugar.
 static int compareQ5(titleADT t1, titleADT t2);
 
 
+// ITERADORES:
+void toBeginYears(queriesADT queries);
+
+void toBeginYearRankings(queriesADT queries);
+
+void toBeginTopAnimatedFilms(queriesADT queries);
+
+void toBeginTopSeries(queriesADT queries);
+
+void toBeginWorstSeries(queriesADT queries);
+
+int hasNextYear(queriesADT queries);
+
 static int hasNext(titleList nTitle);
+
+int hasNextYearRanking(queriesADT queries);
+
+int hasNextTopAnimatedFilms(queriesADT queries);
+
+int hasNextTopSeries(queriesADT queries);
+
+int hasNextWorstSeries(queriesADT queries);
 
 static int nextItem(titleList * nTitle,titleADT title);
 
+// Iterador de años.
+int nextYear(queriesADT queries);
+
+// Iterador para las mejores peliculas (query 4)
+int nextTopAnimatedFilms(queriesADT queries,titleADT title, int *flag);
+
+// Iterador para las peores series (query 6)
+int nextWorstSeries(queriesADT queries, titleADT title, int *flag);
+
+
+// FUNCIONES DE RETORNO:
+// returnCurrentYearQ1 retorna la cantidad de films, series y shorts en el año en el cual apunta el iterador.
+// Funcion de retorno para el query 1
+void returnCurrentYearQ1(queriesADT queries, unsigned int * year,unsigned int * nFilms, unsigned int * nSeries, unsigned int * nShorts);
+
+// Estas funciones no se estan utilizando. Ver abajo de todo porque
+/*
+// Funcion que retorna el nombre del
+int returnCurrentTitleName(queriesADT queries, char ** str);
+
+enum titleType returnCurrentTitleType(queriesADT queries);
+
+int returnCurrentStartYear(queriesADT queries);
+
+int returnCurrentEndYear(queriesADT queries);
+
+float returnCurrentRating(queriesADT queries);
+
+int returnCurrentVotes(queriesADT queries);
+
+int returnCurrentGenres(queriesADT queries, unsigned int index);
+*/
+
+// Funciones de liberacion de memoria:
+// freeElement libera el elemento utilizado para guardar los titulos y su informacion
 static void freeElement(pElement element);
 
+// freeList libera las listas utilizadas para los ranking
+// Notar que esta funcion de libera los contenidos de la lista ya que eso lo hace freeStorage
 static void freeList(titleList list);
 
+// freeYear libera la lista de años
 static void freeYears(yearList year);
 
-static void freeStorage(pElement * vec, unsigned int dim);
+// freeStorage libera todos los elementos dentro del arreglo y el arreglo 
+static void freeStorage(pElement * vec,unsigned int dim);
 
+// freeQueries libera toda la informacion almacenada por queries
 void freeQueries(queriesADT queries);
 
 ////////////////////////////////////////////////////////////
@@ -160,7 +242,6 @@ int processData(queriesADT queries, titleADT title, genreList titleGenres, allGe
 		return TRUE;
 	}
 	
-	setGenres(title, validGenres, titleGenres);
 
 	if (queries->currentElement == NULL){											// Si el currentElement no apunta nada significa que se debe crear uno nuevo
 		queries->currentElement = newCurrentElement(queries->storageDim);
@@ -174,6 +255,7 @@ int processData(queriesADT queries, titleADT title, genreList titleGenres, allGe
 		return FALSE;
 	}
 
+	setGenres(queries->currentElement->title, validGenres, titleGenres);
 	check = updateQueries(queries, yearLowerLimit, yearUpperLimit);					// Funcion encargada de actualizar los queries
 	
 	return check;
@@ -666,7 +748,8 @@ void freeQueries(queriesADT queries){
 	free(queries);
 }
 
-
+// Estas son funciones que actualmetne no se estan utilizando. Si se quieren utilizar se puede cambiar la manera en la cual se devuelven los titulos al front. En vez de tener un iterador por query, utilizamos el currentElement como iterador
+/*
 int returnCurrentTitleName(queriesADT queries, char ** str){
 	return returnTitleName(queries->currentElement->title, str);
 }
@@ -694,5 +777,5 @@ int returnCurrentVotes(queriesADT queries){
 int returnCurrentGenres(queriesADT queries, unsigned int index){
 	return returnGenre(queries->currentElement->title, index);
 }
-
+*/
 

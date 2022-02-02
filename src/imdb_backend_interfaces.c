@@ -39,7 +39,7 @@ int titleCopy(titleADT t1, titleADT t2){
 	t1->numVotes = t2->numVotes;
 	t1->startYear = t2->startYear;
 	t1->endYear = t2->endYear;
-	t1->isAnimation = t2->isAnimation;
+	t1->isAnimation = FALSE;
 	return 1;
 }
 
@@ -87,7 +87,6 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 	while (dim<MAX_GENRES && i < MAX_GENRES && i<genres->dim && titleGenres != NULL){
 		if ((c = strcmp(genres->genresName[i], titleGenres->genre)) == 0){
 			if (strcmp(titleGenres->genre, "animation") == 0){
-				title->isAnimation = TRUE;
 			}
 			else {
 				title->isAnimation = FALSE;
