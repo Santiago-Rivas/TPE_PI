@@ -267,7 +267,7 @@ static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genre
 				strcpy(genresField, field);	
 				break;		
 			case AVERAGE_RATING:
-				setRanking(title, atof(field));
+				setRating(title, atof(field));
 				break;
 			case NUM_VOTES:			
 				setVotes(title, atoi(field));

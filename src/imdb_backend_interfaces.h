@@ -60,25 +60,34 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres);
 // 	titleADT title: Puntero a estructura donde se van a efectuar los cambios necesarios
 //  str: string con el nuevo nombre del titulo
 // Devuelve:
-//  0 ante un error de reserva de memoria
-//  1 si hubo exito en la operacion
+//  TRUE ante un error de reserva de memoria
+//  FALSE si hubo exito en la operacion
 int setTitleName(titleADT title, char * str);
 
 // setTitleType cambia el tipo del titulo ingresado
-// recibe:
+// Recibe:
 // 	titleADT: Puntero a estructura donde se van a efectuar los cambios necesarios
 //  enum titleType: Valores posibles {MOVIE = 0, SHORT, TV_SERIES, TV_MINI_SERIES}
 void setTitleType(titleADT title, enum titleType type);
 
-void setStartYear(titleADT title, int year);
-
-void setEndYear(titleADT title, int year);
-
-// setRanking cambia el valor de ranking del titulo
+// setStartYear cambia el valor del año en el que el titulo fue publicado por primera vez
 // Recibe:
 // 	titleADT: Puntero a estructura donde se van a efectuar los cambios necesarios
-//  float ranking: Nuevo valor de ranking
-void setRanking(titleADT title, float ranking);
+//  year: Año de publicacion
+void setStartYear(titleADT title, int year);
+
+// setStartYear cambia el valor del año en el que el titulo termino de ser publicado
+// En el caso de que sea una pelicula o el titulo sigue publicandose se ingresa NO_YEAR
+// Recibe:
+// 	titleADT: Puntero a estructura donde se van a efectuar los cambios necesarios
+//  year: Año de fin de publicacion
+void setEndYear(titleADT title, int year);
+
+// setRating cambia el valor de rating del titulo
+// Recibe:
+// 	titleADT: Puntero a estructura donde se van a efectuar los cambios necesarios
+//  float rating: Nuevo valor de rating
+void setRating(titleADT title, float rating);
 
 // setVotes cambia el valor de votos del titulo
 // Recibe:
@@ -151,6 +160,12 @@ unsigned int returnGenCount(titleADT title);
 // 	COPY_GEN_VEC_ERROR si algo salio mal
 int returnGenre(titleADT title, unsigned int index);
 
+// returnIsAnimation retorna si un titulo es una animacion o no
+// Recibe:
+// 	titleADT: Puntero a estructura donde se van a obtener los datos necesarios
+// Retorna:
+// 	TRUE si es animacion
+// 	FALSE si no es animacion
 unsigned int returnIsAnimation(titleADT title);
 
 // stringCompare es una funcion de comparacion que compara dos strings sin tomar en consideracion las mayusculas
@@ -160,7 +175,6 @@ unsigned int returnIsAnimation(titleADT title);
 //  > 0 si str1 > str2
 //  < 0 si str1 < str2
 int stringCompare(char * str1, char * str2);
-
 
 // Funcion de comparacion de nombre de titulos
 // Recibe:
