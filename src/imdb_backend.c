@@ -255,7 +255,11 @@ int processData(queriesADT queries, titleADT title, genreList titleGenres, allGe
 		return FALSE;
 	}
 
+	setFalseAnimation(queries->currentElement->title);
+
 	setGenres(queries->currentElement->title, validGenres, titleGenres);
+	//printf("%d\n", returnIsAnimation(queries->currentElement->title));
+
 	check = updateQueries(queries, yearLowerLimit, yearUpperLimit);					// Funcion encargada de actualizar los queries
 	
 	return check;
@@ -326,7 +330,9 @@ static int updateQueries(queriesADT queries, int yearLowerLimit, int yearUpperLi
 	int replaceID2 = NO_ID;
 
 	if (titleType == MOVIE) {					// El query 3 y el query 4 son en relacion a film unicamente
-		if ((returnIsAnimation(queries->currentElement->title) == TRUE) && (titleVotes >= MIN_VOTES_Q2)){
+		//printf("%d	%d\n", returnIsAnimation(queries->currentElement->title) == TRUE, titleVotes >= MIN_VOTES_Q2);
+		if ((returnIsAnimation(queries->currentElement->title) == TRUE) && (titleVotes >= MIN_VOTES_Q2)){ 
+			//printf("entre a q2\n");
 			check = setQuery2(queries, queries->currentElement, &replaceID1); 				// Se analiza el titulo y se actualiza el top ranking del año si es necesario (query 3)
 			if (check == NEW_TITLE_NODE_ERROR) {														// Verifica si hubo algun error de alocamiento de memoria
 				return 0;
@@ -747,6 +753,8 @@ void freeQueries(queriesADT queries){
 	freeElement(queries->currentElement);
 	free(queries);
 }
+
+
 
 // Estas son funciones que actualmetne no se estan utilizando. Si se quieren utilizar se puede cambiar la manera en la cual se devuelven los titulos al front. En vez de tener un iterador por query, utilizamos el currentElement como iterador
 /*

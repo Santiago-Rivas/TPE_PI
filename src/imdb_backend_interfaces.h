@@ -82,8 +82,13 @@ void setRanking(titleADT title, float ranking);
 // setVotes cambia el valor de votos del titulo
 // Recibe:
 // 	titleADT: Puntero a estructura donde se van a efectuar los cambios necesarios
-//  vote: Nuevo valor de votos
+//  	vote: Nuevo valor de votos
 void setVotes(titleADT title, unsigned int votes);
+
+// setFalseAnimation cambia el valor de isAnimation a FALSE
+// Recibe: 
+// 	titleADT: Puntero a estructura donde se van a efectuar los cambios necesarios
+void setFalseAnimation(titleADT title);
 
 // returnTitleName copia en str el nombre del titleADT title
 // Recibe:

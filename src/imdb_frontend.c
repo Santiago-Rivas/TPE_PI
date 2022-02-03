@@ -56,6 +56,16 @@ static void printGenres(FILE * query, titleADT title, allGenres * genres, int pr
 
 
 
+void printAllGenres(allGenres * genres){
+	for (int i = 0 ; i < genres->dim ; i++){
+		printf("%s\n", genres->genresName[i]);
+	}
+}
+
+
+
+
+
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){
 	FILE * genresFile = fopen(genresPath, "r");
 	if (genresFile == NULL){
@@ -93,6 +103,12 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 	}
 
 	fclose(genresFile);
+
+
+
+	//printAllGenres(&genres);
+
+
 
 	// Lectura de obras y llamada al backend
 	queriesADT queries = newQueries();
@@ -546,6 +562,7 @@ static int printTitle(FILE * query,titleADT title)
 		return FALSE;
 	}
 	fprintf(query,"%s",str);
+	//printf("%s\n", str);
 	free(str);
 	return TRUE;
 }
@@ -573,14 +590,20 @@ static void printRating(FILE * query, titleADT title){
 
 static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations){
 	int dim = returnGenCount(title);
+	//printf("%d\n", dim);
 	int i;
 	int addCounter = 0;
+	int genreNum;
 	for (i = 0 ; i < dim ; i++){
-		if (!((printAnimations == FALSE) && (strcmp(genres->genresName[i], "animation") == 0))){
+		genreNum = returnGenre(title, i);
+		if (!((printAnimations == FALSE) && (strcmp(genres->genresName[genreNum], "animation") == 0))){
 			if (i != 0){
 				fprintf(query, ",");
 			}
-			fprintf(query, "%s", genres->genresName[i]);
+			
+			//printf("%d	%d\n", i, genreNum);
+			fprintf(query, "%s", genres->genresName[genreNum]);
+			//printf("%s\n", genres->genresName[genreNum]);
 			addCounter++;
 		}
 	}
@@ -588,3 +611,5 @@ static void printGenres(FILE * query, titleADT title, allGenres * genres, int pr
 		fprintf(query, NO_ELEM_STR2);
 	}
 }
+
+

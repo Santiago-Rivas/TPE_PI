@@ -16,6 +16,8 @@ typedef struct titleCDT {
 	int isAnimation;
 } titleCDT;
 
+static int stringCompare(char * str1, char * str2);
+
 titleADT newTitle(void){
 	titleADT new = calloc(1, sizeof(titleCDT));
 	return new;
@@ -39,7 +41,7 @@ int titleCopy(titleADT t1, titleADT t2){
 	t1->numVotes = t2->numVotes;
 	t1->startYear = t2->startYear;
 	t1->endYear = t2->endYear;
-	t1->isAnimation = FALSE;
+	t1->isAnimation = t2->isAnimation;
 	return 1;
 }
 
@@ -80,16 +82,30 @@ void freeGenreList(genreList list){
 	}
 }
 
+
+static int stringCompare(char * str1, char * str2){
+	int c;
+	if ((c = tolower(*str1) - tolower(*str2)) == 0){
+		return stringCompare(str1+1, str2+1);
+	}
+	return c;
+}
+
 void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
+
+				//printf("%s\n", title->primaryTitle);
 	int dim = 0;
 	int i = 0;
 	int c;
 	while (dim<MAX_GENRES && i < MAX_GENRES && i<genres->dim && titleGenres != NULL){
+		//printf("%s	%s\n", genres->genresName[i], titleGenres->genre);
 		if ((c = strcmp(genres->genresName[i], titleGenres->genre)) == 0){
 			if (strcmp(titleGenres->genre, "animation") == 0){
+				//printf("is animation\n");
+				title->isAnimation = TRUE;
 			}
 			else {
-				title->isAnimation = FALSE;
+				//title->isAnimation = FALSE;
 			}
 			title->genres[dim] = i;
 			dim++;
@@ -104,6 +120,9 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 		}
 	}
 	title->cantGenres = dim;
+	for (int k = 0 ; k < title->cantGenres ; k++ ){
+		//genre: %d\n", title->genres[k]);
+	}
 }
 
 int setTitleName(titleADT title, char * str){
@@ -137,7 +156,9 @@ void setVotes(titleADT title, unsigned int votes){
 	title->numVotes = votes;
 }
 
-
+void setFalseAnimation(titleADT title){
+	title->isAnimation = FALSE;
+}
 
 ///////
 
