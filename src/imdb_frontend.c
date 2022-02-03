@@ -156,7 +156,7 @@ static int readGenresFile(FILE * genresFile, allGenres * genres){
 
 		genres->nameLengths[genres->dim] = nameLen;
 
-		toLowerStr(genres->genresName[genres->dim]);
+		//toLowerStr(genres->genresName[genres->dim]);
 
 		genres->dim += 1;
 		returnGenreName = fgets(genreName, GEN_LINE_MAX_CHARS, genresFile);
@@ -290,7 +290,7 @@ static int getGenres(char * genresField, genreList * firstGenre){
 	int check= TRUE;
 	genreStr = strtok(genresField, ",");
 	while(genreStr != NULL){
-		toLowerStr(genreStr);
+		//toLowerStr(genreStr);
 		(*firstGenre) = addGenres(*firstGenre, genreStr, &check);
 		if (check == FALSE){
 			return FALSE;
@@ -596,7 +596,7 @@ static void printGenres(FILE * query, titleADT title, allGenres * genres, int pr
 	int genreNum;
 	for (i = 0 ; i < dim ; i++){
 		genreNum = returnGenre(title, i);
-		if (!((printAnimations == FALSE) && (strcmp(genres->genresName[genreNum], "animation") == 0))){
+		if (!((printAnimations == FALSE) && (stringCompare(genres->genresName[genreNum], "animation") == 0))){
 			if (i != 0){
 				fprintf(query, ",");
 			}

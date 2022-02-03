@@ -16,7 +16,6 @@ typedef struct titleCDT {
 	int isAnimation;
 } titleCDT;
 
-static int stringCompare(char * str1, char * str2);
 
 titleADT newTitle(void){
 	titleADT new = calloc(1, sizeof(titleCDT));
@@ -83,12 +82,15 @@ void freeGenreList(genreList list){
 }
 
 
-static int stringCompare(char * str1, char * str2){
-	int c;
-	if ((c = tolower(*str1) - tolower(*str2)) == 0){
-		return stringCompare(str1+1, str2+1);
-	}
-	return c;
+int stringCompare(char * str1, char * str2){
+    int c = tolower(*str1) - tolower(*str2);
+    if (*str1 == 0 || *str2 == 0){
+            return c;
+    }
+    if (c == 0){
+            return stringCompare(str1+1, str2+1);
+    }
+    return c;
 }
 
 void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
@@ -99,8 +101,8 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 	int c;
 	while (dim<MAX_GENRES && i < MAX_GENRES && i<genres->dim && titleGenres != NULL){
 		//printf("%s	%s\n", genres->genresName[i], titleGenres->genre);
-		if ((c = strcmp(genres->genresName[i], titleGenres->genre)) == 0){
-			if (strcmp(titleGenres->genre, "animation") == 0){
+		if ((c = stringCompare(genres->genresName[i], titleGenres->genre)) == 0){
+			if (stringCompare(titleGenres->genre, "animation") == 0){
 				//printf("is animation\n");
 				title->isAnimation = TRUE;
 			}

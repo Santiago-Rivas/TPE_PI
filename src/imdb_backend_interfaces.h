@@ -153,28 +153,37 @@ int returnGenre(titleADT title, unsigned int index);
 
 unsigned int returnIsAnimation(titleADT title);
 
+// stringCompare es una funcion de comparacion que compara dos strings sin tomar en consideracion las mayusculas
+// Recibe:
+// 	Dos strings
+// Retorna:
+//  > 0 si str1 > str2
+//  < 0 si str1 < str2
+int stringCompare(char * str1, char * str2);
+
+
 // Funcion de comparacion de nombre de titulos
 // Recibe:
 // 	Dos titleADT para ser comparados
 // Retorna:
-// > 0 si t1 > t2
-// < 0 si t1 < t2
+//  > 0 si t1 > t2
+//  < 0 si t1 < t2
 int compareTitleNames(titleADT t1, titleADT t2);
 
 // Funcion de comparacion de cantidad de votos de titulos
 // Recibe:
 // 	Dos titleADT para ser comparados
 // Retorna:
-// > 0 si t1 > t2
-// < 0 si t1 < t2
+//  > 0 si t1 > t2
+//  < 0 si t1 < t2
 int compareNumVotes(titleADT t1, titleADT t2);
 
 // Funcion de comparacion del rating de titulos titulos
 // Recibe:
 // 	Dos titleADT para ser comparados
 // Retorna:
-// > 0 si t1 > t2
-// < 0 si t1 < t2
+//  > 0 si t1 > t2
+//  < 0 si t1 < t2
 float compareRating(titleADT t1, titleADT t2);
 
 // Libera un titleADT
