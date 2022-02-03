@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define MAX_GENRES 32 		// Cantidad maxima de generos que se evaluaran
 #define BLOCK 5
