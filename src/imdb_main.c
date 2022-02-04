@@ -49,7 +49,7 @@ int main( int argc, char *argv[] )  {
 	}
 
 	check = imdb_frontend_main(argv[1], argv[2], yMin, yMax);
-	return check == TRUE ? EXIT_SUCCESS : check;						// Si check es TRUE significa que no ocurrio ningun error. En el caso contrario significa que ocurrio un error de alocamiento o al abrir un archivo. En estos dos casos check tiene el valor asociado a ese error
+	return (check == TRUE) ? EXIT_SUCCESS : check;						// Si check es TRUE significa que no ocurrio ningun error. En el caso contrario significa que ocurrio un error de alocamiento o al abrir un archivo. En estos dos casos check tiene el valor asociado a ese error
 }
 
 static int validatePath(char * path){ 								//Devuelve false si el path contiene un caracter invalido de los listados a continuacion, true en caso contrario (path valido)
