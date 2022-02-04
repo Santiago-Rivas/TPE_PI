@@ -33,12 +33,14 @@ queriesADT newQueries(int yMin, int yMax);
 int processData(queriesADT queries, titleADT title, genreList titleGenres, allGenres * validGenres);
 
 // ITERADORES:
-
 // toBeginYears hace apuntar el iterador de años al primer año de la lista
 // Recibe:
 // queries:Un puntero a la estructura donde se almacena toda la información necesaria para las queries
 void toBeginYears(queriesADT queries);
 
+// toBeginYearRanking hace apuntar el iterador del ranking por año al primer año de la lista
+// Recibe:
+// queries:Un puntero a la estructura donde se almacena toda la información necesaria para las queries
 void toBeginYearRankings(queriesADT queries);
 
 // toBeginTopFilms hace apuntar el iterador de  mejores peliculas a la primer pelicula de la lista.

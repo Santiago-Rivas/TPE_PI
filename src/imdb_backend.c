@@ -63,8 +63,6 @@ typedef struct queriesCDT{
 	int lowerYearLimit;						// Año minimo para los queries 4 y 5
 	int upperYearLimit;						// Año minimo para los queries 4 y 5
 
-	// Con la nueva implementacion de updateRank se pueden sacar ya que se cuentan internamente en la funcion.
-	// El tema es que haria recursiones 5050 * 4 recursiones de mas.
 	unsigned int nTopAnimatedFilms;							// Cntidad de elementos en la lista de mejores peliculas
 	unsigned int nTopSeries;						// Cantidad de elementos en la lista de mejores series
 	unsigned int nWorstSeries;						// Cantidad de elementos en la lista de peores serie
@@ -110,17 +108,35 @@ static int setQuery4(queriesADT queries, pElement title, int * removeID);
 // setQuery5 actualiza los datos que pertenecen al query5
 static int setQuery5(queriesADT queries, pElement title, int * removeID);
 
+// La funcion rankMaker es llamada por las funciones setQuery
+// Esta funcion verifica si se llego a la maxima cantidad de elemento en un ranking y se encarga de llamar a updateRank
+// Parametros de entrada:
+// 	ranking: Ranking que se quiere actualizar
+// 	element: Elemento que contiene el titulo que se quiere agregar al ranking
+// 	dim: Cantidad actual de elementos dentro del ranking
+// 	max: Cantidad maxima de elementos que puede contener cada query. Estas son constantes definidas en imdb_backend.h
+// 	compare: Puntero a la funcion de comparacion que depende de cada query
+// Parametro de salida:
+// 	removeID: Indice del elemento a remover del arreglo de pElements que se necesitan en los queries
+static int rankMaker(titleList * ranking, pElement element, unsigned int dim, int max, int (*compare) (titleADT t1, titleADT t2), int * removeID);
+
+// updateRank es una funcion recursiva que actualiza una lista de titleList
+// Si la maxima cantidad de elementos que puede tener el rank es exedida (se indica con el flag) se retorna en removeID el indice del elemento encontrado por findLast
+// Parametros de entrada:
+// 	first: Puntero de nodo de la lista que se debe analizar en la recursion actual
+// 	title: Titulo el cual se quiere agregar a la lista
+// 	compare: Puntero a la funcion de comparacion que depende de cada query
+// 	flag: Indicador de si la lista tiene la cantidad maxima de elementos posibles (determinado por la funcion rankMaker)
+// Parametro de salida:
+// 	removeID: Indice del elemento a remover del arreglo de pElements que se necesitan en los queries
+static titleList updateRank(titleList first, pElement title, int (*compare) (titleADT t1, titleADT t2), int * flag, int * removeID);
+
 // findLast es una funcion recursiva que encuentra el ultimo elemento de una lista. La funcoin es llamada solo cuando se agrega una elemento a una lista.
 // Parametros de enrada:
 // 	list: Elemnto proximo al elemento agregado a la lista.
 // Parametros de salida:
 // 	flag: Id del ultimo pElement de la lista. Si el pElement sigue siendo utilizado en otro query (indicado por inUse) la funcion retorna NO_ID
 static titleList findLast(titleList list, int * flag);
-
-
-static titleList updateRank(titleList first, pElement title, int (*compare) (titleADT t1, titleADT t2), int * flag, int * removeID);
-
-static int rankMaker(titleList * ranking, pElement element, unsigned int dim, int max, int (*compare) (titleADT t1, titleADT t2), int * removeID);
 
 // addCurrentToStorage agrega el curretnElement del parametro queries al arreglo con todos los pElements que estan en uso
 static int addCurrentToStorage(queriesADT queries);
@@ -131,9 +147,7 @@ static void removeId(queriesADT queries, int replaceID);
 // La funcion updateStorage se encarga de agregar y liberar pElements del arreglo con todos los pEleemnts que se estan utilizando por lo queries
 static int updateStorage(queriesADT queries, int replaceID1, int replaceID2);
 
-
-// Funciones de comparacion
-
+// Funciones de comparacion:
 // Esta funcion compara dos titleADT segun su rating. A igualdad de rating se compara el numero de votos.
 static int compareRatingVotes(titleADT t1, titleADT t2);
 
@@ -179,7 +193,6 @@ int nextTopAnimatedFilms(queriesADT queries,titleADT title, int *flag);
 // Iterador para las peores series (query 6)
 int nextWorstSeries(queriesADT queries, titleADT title, int *flag);
 
-
 // FUNCIONES DE RETORNO:
 // returnCurrentYearQ1 retorna la cantidad de films, series y shorts en el año en el cual apunta el iterador.
 // Funcion de retorno para el query 1
@@ -202,7 +215,7 @@ static void freeStorage(pElement * vec,unsigned int dim);
 // freeQueries libera toda la informacion almacenada por queries
 void freeQueries(queriesADT queries);
 
-////////////////////////////////////////////////////////////
+////////////////////////////////////////////////// Definicion de Funciones //////////////////////////////////////////////////
 
 
 // Funcion que crea nuevos queriesADT
@@ -213,23 +226,26 @@ queriesADT newQueries(int yMin, int yMax){
 	return new;
 }
 
+// processData es una funcion que recibe un titulo y se encarga de decidir si ese titulo cumple las condiciones generales para ser evaluada por al menos el query 1. Estas condiciones son que tenga un tipo valido y que tenga un startYear valido
+// Por otro lado, se copia el titulo actual al currentElement de la estructura queries
+// Luego, una vez que se copiaron todos los datos del titulo se le ingresan los generos y se identifica si el titulo es o no una animacion
 int processData(queriesADT queries, titleADT title, genreList titleGenres, allGenres * validGenres){
 
-	if (title == NULL) {															// Se introdujo un titulo invalido
+	if (title == NULL) {					// Se introdujo un titulo invalido
 		return TRUE;
 	}
-	if (returnType(title) < MOVIE) {												// Titulo de tipo invalido
+	if (returnType(title) < MOVIE) {			// Titulo de tipo invalido
 		return TRUE;
 	}
-	if (returnVotes(title) == 0) {													// Ignorar titulos con cero votos
+	if (returnVotes(title) == 0) {				// Ignorar titulos con cero votos
 		return TRUE;
 	}
-	if (returnStartYear(title) <= NO_YEAR){		// startYear invalido
+	if (returnStartYear(title) <= NO_YEAR){			// startYear invalido
 		return TRUE;
 	}
 	
 
-	if (queries->currentElement == NULL){											// Si el currentElement no apunta nada significa que se debe crear uno nuevo
+	if (queries->currentElement == NULL){								// Si el currentElement no apunta nada significa que se debe crear uno nuevo
 		queries->currentElement = newCurrentElement(queries->storageDim);
 		if (queries->currentElement == NULL){
 			return FALSE;
@@ -241,9 +257,7 @@ int processData(queriesADT queries, titleADT title, genreList titleGenres, allGe
 		return FALSE;
 	}
 
-	setFalseAnimation(queries->currentElement->title);
-
-	setGenres(queries->currentElement->title, validGenres, titleGenres);
+	setGenres(queries->currentElement->title, validGenres, titleGenres);				// Se actualiza el arreglo de generos dentro de title. Si title es una animacion se actualiza el camp isAnimation a TRUE
 	check = updateQueries(queries);									// Funcion encargada de actualizar los queries
 	
 	return check;
@@ -251,24 +265,24 @@ int processData(queriesADT queries, titleADT title, genreList titleGenres, allGe
 
 // newCurrentElement crea un nuevo puntero a tElement y le otorga un id
 static pElement newCurrentElement(unsigned int maxId){			
-	pElement new = malloc(sizeof(tElement));							// Alocamiento de memoria	
+	pElement new = malloc(sizeof(tElement));							// Alocamiento de memoria
 	if (new == NULL){
 		return NULL;
 	}
-	new->title = newTitle();											// Se crea un nuevo titleADT y se lo asigna
+	new->title = newTitle();									// Se crea un nuevo titleADT y se lo asigna
 	if (new->title == NULL){
 		free(new);
 		return NULL;
 	}
-	new->inUse = 0;														// No esta en uso
-	new->id = maxId;													// Asignacion de indice para la posible posicion que podria tener en el arreglo de elementos
+	new->inUse = 0;											// No esta en uso
+	new->id = maxId;										// Asignacion de indice para la posible posicion que podria tener en el arreglo de elementos
 	return new;
 }
 
 static yearList findYear(yearList first, int year, yearList * current){
 	if (first == NULL || first->year < year){				// No se encontro un nodo con el año buscado
 		yearList new = calloc(1, sizeof(yearNode));			// Alocamiento de memoria para un nuevo yearNode
-		if (new == NULL){									// Se produjo un error de alocamiento de memoria
+		if (new == NULL){						// Se produjo un error de alocamiento de memoria
 			*current = NULL;					// Devuelve un puntero a NULL
 			return NULL;						// No se agregan nodos a la lista
 		}
@@ -297,118 +311,119 @@ static yearList findYear(yearList first, int year, yearList * current){
 static int updateQueries(queriesADT queries){
 	unsigned int check = TRUE; 													// Verificador de error. 1: Todo salio bien. 0 Algo salio mal.
 
-	int titleStartYear = returnStartYear(queries->currentElement->title);			// Se guarda el start
+	int titleStartYear = returnStartYear(queries->currentElement->title);								// Se guarda el start
 	int titleEndYear = returnEndYear(queries->currentElement->title);
 	unsigned int titleType = returnType(queries->currentElement->title);
 	unsigned int titleVotes = returnVotes(queries->currentElement->title);
 	
-	yearList current;															// Puntero al nodo del año al cual el titulo pertenece
-	queries->firstYear = findYear(queries->firstYear, titleStartYear, &current);		// Se encuentra el nodo del año del titulo o se crea uno nuevo si es necesario
+	yearList current;														// Puntero al nodo del año al cual el titulo pertenece
+	queries->firstYear = findYear(queries->firstYear, titleStartYear, &current);							// Se encuentra el nodo del año del titulo o se crea uno nuevo si es necesario
 	if (current == NULL) { 														// Si current es NULL significa que hubo un error
-		return 0;
+		return FALSE;
 	}
 
-	setQuery1(current, titleType); 			// Se analiza el titulo y se actualizan los datos del query 1
+	setQuery1(current, titleType); 													// Se analiza el titulo y se actualizan los datos del query 1
 	
 	int replaceID1 = NO_ID;
 	int replaceID2 = NO_ID;
 
-	if (titleType == MOVIE) {					// El query 3 y el query 4 son en relacion a film unicamente
+	if (titleType == MOVIE) {													// El query 2 y el query 3 son en relacion a film unicamente
 		if ((returnIsAnimation(queries->currentElement->title) == TRUE) && (titleVotes >= MIN_VOTES_Q2)){ 
-			check = setQuery2(queries, queries->currentElement, &replaceID1); 				// Se analiza el titulo y se actualiza el top ranking del año si es necesario (query 3)
-			if (check == NEW_TITLE_NODE_ERROR) {														// Verifica si hubo algun error de alocamiento de memoria
-				return 0;
+			check = setQuery2(queries, queries->currentElement, &replaceID1); 						// Se analiza el titulo y se actualiza el top ranking del año si es necesario (query 3)
+			if (check == NEW_TITLE_NODE_ERROR) {										// Verifica si hubo algun error de alocamiento de memoria
+				return FALSE;
 			}
 		}
-		check = setQuery3(current, queries->currentElement, &replaceID1);			// Se analiza el titulo y se actualiza el top ranking de films
-		if (check == NEW_TITLE_NODE_ERROR) {													// Verifica si hubo algun error de alocamiento de memoria
-			return 0;
+		check = setQuery3(current, queries->currentElement, &replaceID1);							// Se analiza el titulo y se actualiza el top ranking de films
+		if (check == NEW_TITLE_NODE_ERROR) {											// Verifica si hubo algun error de alocamiento de memoria
+			return FALSE;
 		}
-	} 																			// El querry 4 y 5 son en relacion a series unciamente entre los años limites especificados
+	}
+	// El query 4 y 5 son en relacion a series unciamente entre los años limites especificados
+	// checkYearCondition es llamada para verificar los años del titulo
+	// Se llama al final del if para que solo sea llamado si el titulo es una serie y no trate de chequear shorts
 	else if ((titleType == TV_SERIES || titleType == TV_MINI_SERIES) && (checkYearCondition(titleStartYear, titleEndYear, queries->lowerYearLimit, queries->upperYearLimit) == TRUE)) {
 		if (titleVotes >= MIN_VOTES_Q4){
-			check = setQuery4(queries, queries->currentElement, &replaceID1); 				// Se analiza el titulo y se actualiza el top ranking de series
-			if (check == NEW_TITLE_NODE_ERROR) {														// Verifica si hubo algun error de alocamiento de memoria
-				return 0;
+			check = setQuery4(queries, queries->currentElement, &replaceID1); 						// Se analiza el titulo y se actualiza el top ranking de series
+			if (check == NEW_TITLE_NODE_ERROR) {										// Verifica si hubo algun error de alocamiento de memoria
+				return FALSE;
 			}
 		}
 		if (titleVotes >= MIN_VOTES_Q5){
-			check = setQuery5(queries, queries->currentElement, &replaceID2); 				// Se analiza el titulo y se actualiza el worst ranking de series
-			if (check == NEW_TITLE_NODE_ERROR) {														// Verifica si hubo algun error de alocamiento de memoria
-				return 0;
+			check = setQuery5(queries, queries->currentElement, &replaceID2); 						// Se analiza el titulo y se actualiza el worst ranking de series
+			if (check == NEW_TITLE_NODE_ERROR) {										// Verifica si hubo algun error de alocamiento de memoria
+				return FALSE;
 			}
 		}
 	}
 	check = updateStorage(queries, replaceID1, replaceID2);						// Actualizar el arreglo de elementos
-	if (check == 0){
-		return 0;
+	if (check == FALSE){
+		return FALSE;
 	}
 
-	return 1;
+	return TRUE;
 }
 
 
 // Esta funcion verifica si el titulo cae dentro de los años especificados para el query 4 y el query 5
 static int checkYearCondition(int startYear, int endYear, int yMin, int yMax){
-	if (yMin == 0){
+	if (yMin == NO_YEAR){									// No hay restricciones de año
 		return TRUE;
 	}
-	if ((yMax == 0) && (startYear >= yMin)){
+	if ((yMax == NO_YEAR) && (startYear >= yMin)){						// No hay restricciones de año maximo y la serie comenzo a publicarse despues del limite inferior
 		return TRUE;
 	}
-	if ((startYear >= yMin) && (startYear <= yMax)){
+	if ((startYear >= yMin) && (startYear <= yMax)){					// La serie comenzo a publicarse dentro de los limites
 		return TRUE;
 	}
-	if ((endYear != NO_YEAR) && (endYear >= yMin) && (endYear <= yMax)){
+	if ((endYear != NO_YEAR) && (endYear >= yMin) && (endYear <= yMax)){			// La serie tiene alguna temporada dentro de los limites
 		return TRUE;
 	}
-	if ((startYear <= yMax) && (endYear == NO_YEAR)){
+	if ((startYear <= yMax) && (endYear == NO_YEAR)){					// Siguen saliendo temporadas del titulo y la serie comenzo a salir antes del limite superior
 		return TRUE;
 	}
-	return FALSE;
+	return FALSE;										// Ninguna de las condiciones se cumplen entonces la serie no esta dentro del rango de años especificados
 }
 
 // Funcion para agrega el currentElement al final del arreglo de pElement
 static int addCurrentToStorage(queriesADT queries){
-	if (queries->storageDim == queries->storageMax){												// Verifica si hay espacio
-		queries->storageMax += BLOCK;																// Se incrementa la dimension maxima
+	if (queries->storageDim == queries->storageMax){							// Verifica si hay espacio
+		queries->storageMax += BLOCK;									// Se incrementa la dimension maxima
 		queries->storeData = realloc(queries->storeData, queries->storageMax * sizeof(tElement));	// En el caso de que no haya espacio se reserva de a bloque
-		if (queries->storeData == NULL){															// Error de alocamiento
+		if (queries->storeData == NULL){								// Error de alocamiento
 			return FALSE;
 		}
 	}
-	queries->storeData[queries->storageDim] = queries->currentElement;								// Guardo el currentElement en la ultima posicion del arreglo
-	queries->currentElement = NULL;																	// Blanquear el currentElement ya que no se necesita mas para esta iteracion
-	queries->storageDim += 1;																		// Se incrementa el contador de la dimension del arreglo
+	queries->storeData[queries->storageDim] = queries->currentElement;					// Guardo el currentElement en la ultima posicion del arreglo
+	queries->currentElement = NULL;										// Blanquear el currentElement ya que no se necesita mas para esta iteracion
+	queries->storageDim += 1;										// Se incrementa el contador de la dimension del arreglo
 	return TRUE;
 }
 
 // Funcion para remover del arreglo el elemento de un id especifico
 static void removeId(queriesADT queries, int replaceID){
-	pElement aux = queries->storeData[replaceID];													// Elemento a eliminar y a liberar
-	queries->storageDim -= 1;																		// Se saca un elemento de la lista entonces disminuye la dimension
-	queries->storeData[replaceID] = queries->storeData[queries->storageDim];						// Se remplaza el elemento a remover por el ultimo elemento del arreglo
-	queries->storeData[queries->storageDim] = NULL;													// Se pone NULL como ultimo elemento del arreglo
-	queries->storeData[replaceID]->id = replaceID;	
+	pElement aux = queries->storeData[replaceID];								// Elemento a eliminar y a liberar
+	queries->storageDim -= 1;										// Se saca un elemento de la lista entonces disminuye la dimension
+	queries->storeData[replaceID] = queries->storeData[queries->storageDim];				// Se remplaza el elemento a remover por el ultimo elemento del arreglo
+	queries->storeData[queries->storageDim] = NULL;								// Se pone NULL como ultimo elemento del arreglo
+	queries->storeData[replaceID]->id = replaceID;								// Se le da el id del elemento viejo al elemento intercambiado
 	freeElement(aux);
 }
 
 // Funcion para agreagr o eleiminar elementos del arreglo con todos los elementos utilizados
 static int updateStorage(queriesADT queries, int replaceID1, int replaceID2){
-	if (queries->currentElement->inUse != 0){														// Verifica que se utilizo el currentElement
-		int check = addCurrentToStorage(queries);													// Agrega a current element al final del arreglo
+	if (queries->currentElement->inUse != 0){								// Verifica que se utilizo el currentElement
+		int check = addCurrentToStorage(queries);							// Agrega a current element al final del arreglo
 		if (check == 0){
 			return FALSE;
 		}
-		if (replaceID1 > NO_ID){
-			// Verifica si se debe liberar un elemento
-			removeId(queries, replaceID1);															// Libera elemento
+		if (replaceID1 > NO_ID){									// Verifica si se debe liberar un elemento
+			removeId(queries, replaceID1);								// Libera elemento
 		}
-		if (replaceID2 > NO_ID){
-			// Verifica si se debe liberar otro elemento
-			removeId(queries, replaceID2);															// Libera elemento
+		if (replaceID2 > NO_ID){									// Verifica si se debe liberar otro elemento
+			removeId(queries, replaceID2);								// Libera elemento
 		}
-	}																								// En el caso de no haberse utilizado entonces no se debe agregar ni tampoco sacar elementos del arreglo
+	}													// En el caso de no haberse utilizado entonces no se debe agregar ni tampoco sacar elementos del arreglo
 	return TRUE;
 }
 
@@ -417,20 +432,21 @@ static void setQuery1(yearList current, enum titleType type){
 	switch (type)
 	{
 		case MOVIE:
-			current->nMovies += 1;  												//Si es una film, incrementa la cantidad de peliculas en ese año
+			current->nMovies += 1;  								//Si es una film, incrementa la cantidad de peliculas en ese año
 			break;
-		case SHORT:            													//Si es un short, incrementa la cantidad de cortos en ese año
+		case SHORT:            										//Si es un short, incrementa la cantidad de cortos en ese año
 			current->nShorts += 1;
 			break;
-		case TV_SERIES:        													//Si es una serie o una mini serie, incrementa la cantidad de series en ese año
+		case TV_SERIES:        										//Si es una serie o una mini serie, incrementa la cantidad de series en ese año
 		case TV_MINI_SERIES:
 			current->nSeries += 1;
 			break;
-		default:																// Cualquier otro caso no hace nada
+		default:											// Cualquier otro caso no hace nada
 			;
 	}
 }
 
+// updateRank actualiza la lista que contiene a los elementos de un ranking. En el caso de que se deba devolver el indice del elemento que esta de
 static titleList updateRank(titleList first, pElement element, int (*compare) (titleADT t1, titleADT t2), int * flag, int * removeID){
 	int c;
 	if (first == NULL){
