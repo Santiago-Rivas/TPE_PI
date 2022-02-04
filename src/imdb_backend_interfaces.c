@@ -8,6 +8,7 @@ typedef struct titleCDT {
 	enum titleType type;				// Tipo del titulo
 	char * primaryTitle;				// Nombre del titulo
 	unsigned int titleLen;				// Longitud del nombre del titulo
+	unsigned int maxLen;
 	int startYear;						// Año cuando salio originalmente el titulo
 	int endYear;						// Año en el cual la serie se dejo de publicar (para peliuclas y para series que siguen sacando nuevos capitulos se utiliza NO_YEAR)
 	unsigned int genres[MAX_GENRES]; 	// Vector que contiene los indices de los generos del titulo en relacion a la estructura allGenres		
@@ -142,7 +143,10 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 // setTitleName actualiza el campo primaryTitle, alocando la memoria necesaria para gaurdar el nombre del titulo
 int setTitleName(titleADT title, char * str){
 	int dim = strlen(str);															// Se encuentra la longitud del nombre del titulo
-	title->primaryTitle = realloc(title->primaryTitle, (dim + 1) * sizeof(char));	// Se aloca la memoria necesaria para copiar el nombre del titulo
+	if (dim > title->maxLen){
+		title->primaryTitle = realloc(title->primaryTitle, (dim + 1) * sizeof(char));	// Se aloca la memoria necesaria para copiar el nombre del titulo
+		title->maxLen = dim;
+	}
 	if (title->primaryTitle == NULL){												// Error de alocamiento
 		return FALSE;
 	}
