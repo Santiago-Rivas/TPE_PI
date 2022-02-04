@@ -17,6 +17,7 @@
 #define INVALID_INDEX -1
 #define INVALID_TYPE -1
 #define NO_YEAR_LIMIT -1
+#define Q2_GENRE_NAME "animation"
 
 #define TRUE 1
 #define FALSE 0

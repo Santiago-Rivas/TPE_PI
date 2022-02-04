@@ -12,43 +12,62 @@
 // 	genres: Estructura que contiene un arreglo con los nombres de los diferentes generos. Tambien guarda la cantidad de generos que hay en total y la longitud de los strings de generos.
 static int readGenresFile(FILE * genresFile, allGenres * genres);
 
-
+// freeAllGenres es una función que libera la estructura que contiene los generos válidos, que se encontraban en el archivo genres.csv
+// Parametros de entrada:
+//  genres: Puntero a la estructura que contiene los generos válidos
 static void freeAllGenres(allGenres * genres);
+
 
 static int getGenres(char * genresField, genreList * firstGenre);
 
+// readTitlesFile se encarga de leer el archivo imdb.csv
 static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * genres);
+
 
 static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genreList * firstGenre);
 
+
 static int getType(char * str);
+
 
 static int writeData(queriesADT queries, allGenres * genres);
 
+
 static void closeFileId(FILE * fileId[TOTAL_QUERY_NUMBER]);
+
 
 static int printYearlyQueries(FILE * query1, FILE * query3, queriesADT queries, allGenres * genres,titleADT title);
 
+
 static void printQuery1(FILE * query1, queriesADT queries);
+
 
 static int printQuery2(FILE * query2, queriesADT queries, allGenres * genres, titleADT title);
 
+
 static int printQuery3(FILE * query3, queriesADT queries, allGenres * genres, titleADT title);
 
+
 static int printQuery4(FILE * query4, queriesADT queries, titleADT title);
+
 
 static int printQuery5(FILE * query5, queriesADT queries, allGenres * genres, titleADT title);
 
 
 static int printTitle(FILE * query,titleADT title);
 
+
 static void printStartYear(FILE * query, titleADT title);
+
 
 static void printEndYear(FILE * query, titleADT title);
 
+
 static void printVotes(FILE * query, titleADT title);
 
+
 static void printRating(FILE * query, titleADT title);
+
 
 static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations);
 
@@ -252,6 +271,7 @@ static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genre
 		fieldNum++;
 		field = strtok(NULL, SEPARATOR);
 	}
+	setFalseAnimation(title);
 	check = getGenres(genresField,firstGenre);
 
 	return check;
@@ -272,7 +292,6 @@ static int getGenres(char * genresField, genreList * firstGenre){
 	}
 	return TRUE;
 }
-
 
 static int getType(char * str){
 	
@@ -355,7 +374,6 @@ static void closeFileId(FILE * fileId[TOTAL_QUERY_NUMBER]){
 	}
 }
 
-
 static int printYearlyQueries(FILE * query1, FILE * query3, queriesADT queries, allGenres * genres,titleADT title)
 {
 	if(query1==NULL && query3==NULL)
@@ -421,7 +439,6 @@ static int printQuery2(FILE * query2, queriesADT queries, allGenres * genres, ti
 	return TRUE;
 }
 
-
 static int printQuery3(FILE * query3, queriesADT queries, allGenres * genres, titleADT title)
 {
 	toBeginYearRankings(queries);
@@ -452,7 +469,6 @@ static int printQuery3(FILE * query3, queriesADT queries, allGenres * genres, ti
 	}
 	return TRUE;
 }
-
 
 static int printQuery4(FILE * query4, queriesADT queries, titleADT title)
 {
@@ -518,8 +534,6 @@ static int printQuery5(FILE * query5, queriesADT queries,allGenres * genres, tit
 	return TRUE;
 }
 
-
-
 static int printTitle(FILE * query,titleADT title)
 {
 	char * str = NULL;
@@ -562,7 +576,7 @@ static void printGenres(FILE * query, titleADT title, allGenres * genres, int pr
 	int genreNum;
 	for (i = 0 ; i < dim ; i++){
 		genreNum = returnGenre(title, i);
-		if (!((printAnimations == FALSE) && (stringCompare(genres->genresName[genreNum], "animation") == 0))){
+		if (!((printAnimations == FALSE) && (stringCompare(genres->genresName[genreNum], Q2_GENRE_NAME) == 0))){
 			if (i != 0){
 				fprintf(query, ",");
 			}

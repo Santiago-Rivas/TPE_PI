@@ -15,7 +15,7 @@ typedef struct titleCDT {
 	unsigned int cantGenres;			// Cantidad de generos que tiene el ti
 	float averageRating;				// RAting del titulo
 	unsigned int numVotes;				// Cantidad de votos que tiene el titulo
-	int isAnimation;					// TRUE si es animacion. FALSE si no es animacion
+	char isAnimation;					// TRUE si es animacion. FALSE si no es animacion
 } titleCDT;
 
 // Funcion que crea un nuevo titleADT
@@ -110,7 +110,7 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 	int c;																				// Constante para guardar el resultado de comparaciones
 	while (dim<MAX_GENRES && i < MAX_GENRES && i<genres->dim && titleGenres != NULL){	// Ciclo hasta que no hayan mas genereros validos para analizar o hasta que no hayan mas generos pertenecientes al titulo
 		if ((c = stringCompare(genres->genresName[i], titleGenres->genre)) == 0){		// Se enceuntra un genero valido dentro de la lista de generos pertenecientes a un titulo
-			if (stringCompare(titleGenres->genre, "animation") == 0){					// El titulo pertenece al genero Animation
+			if (stringCompare(titleGenres->genre, Q2_GENRE_NAME) == 0){					// El titulo pertenece al genero Animation
 				title->isAnimation = TRUE;												// Se actualiza el campo para indicar que el titulo es una animacion
 			}
 			title->genres[dim] = i;														// En el arreglo de 
