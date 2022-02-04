@@ -635,22 +635,18 @@ static int hasNext(titleList nTitle){
 }
 
 int hasNextYearRanking(queriesADT queries){
-
 	return hasNext(queries->yearRankingIter);
 }
 
 int hasNextTopAnimatedFilms(queriesADT queries){
-
 	return hasNext(queries->topAnimatedFilmsIterator);
 }
 
 int hasNextTopSeries(queriesADT queries){
-
 	return hasNext(queries->topSeriesIterator);
 }
 
 int hasNextWorstSeries(queriesADT queries){
-
 	return hasNext(queries->worstSeriesIterator);
 }
 

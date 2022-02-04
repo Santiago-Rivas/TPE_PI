@@ -6,15 +6,15 @@
 
 #define Q2_TYPES 2  		            // Cantidad de tipos que se consideraran para el query 2
 #define ZERO 0.0001   		            // Los resultados se van a devolver con dos puntos decimales
-#define POSITIVE 1
-#define NEGATIVE -1
+#define POSITIVE 1                      // Para indicar valores positivos
+#define NEGATIVE -1                     // Para indicar valores negativos
 #define MAX_TOP_YEAR 100	            // Cantidad de titulo en el ranking del query 3
 #define MAX_TOP_ANIMATED_FILMS 500	    // Cantidad de titulos en el ranking del query 4
 #define MAX_TOP_SERIES 250	            // Cantidad de titulos en el ranking del query 5
 #define MAX_WORST_SERIES 50	            // Cantidad de titulos en el ranking del query 6
-#define MIN_VOTES_Q2 20000              // Numero minimo de votos para ser considerados en el query 2
-#define MIN_VOTES_Q4 50000
-#define MIN_VOTES_Q5 5000               // Numero minimo de votos para ser considerados en el query 5
+#define MIN_VOTES_Q2 20000              // Numero minimo de votos para que un titulo sea considerado en el query 2
+#define MIN_VOTES_Q4 50000              // Numero minimo de votos para que un titulo sea considerado en el query 4
+#define MIN_VOTES_Q5 5000               // Numero minimo de votos para que un titulo sea considerado en el query 5
 #define MOVIES_ROW 0                    // Fila de la matriz en donde estan guardadas la cantidad de peliculas por genero
 #define SERIES_ROW 1                    // Fila de la matriz en donde estan guardadas la cantidad de series por genero
 
@@ -68,12 +68,32 @@ void toBeginWorstSeries(queriesADT queries);
 // Un 1 si hay un próximo elemento, 0 si no hay
 int hasNextYear(queriesADT queries);
 
+// hasNextYearRanking se fija si hay un próximo elemento en el iterador de ranking por año 
+// Recibe:
+// queries:Un puntero a la estructura donde se almacena toda la información necesaria para las queries
+// Devuelve:
+// Un 1 si hay un próximo elemento, 0 si no hay
 int hasNextYearRanking(queriesADT queries);
 
+// hasNextTopAnimatedFilms se fija si hay un próximo elemento en el iterador de ranking de peliculas animadas
+// Recibe:
+// queries:Un puntero a la estructura donde se almacena toda la información necesaria para las queries
+// Devuelve:
+// Un 1 si hay un próximo elemento, 0 si no hay
 int hasNextTopAnimatedFilms(queriesADT queries);
 
+// hasNextTopSeries se fija si hay un próximo elemento en el iterador de mejores series
+// Recibe:
+// queries:Un puntero a la estructura donde se almacena toda la información necesaria para las queries
+// Devuelve:
+// Un 1 si hay un próximo elemento, 0 si no hay
 int hasNextTopSeries(queriesADT queries);
 
+// hasNextWorstSeries se fija si hay un próximo elemento en el iterador de de peores series
+// Recibe:
+// queries:Un puntero a la estructura donde se almacena toda la información necesaria para las queries
+// Devuelve:
+// Un 1 si hay un próximo elemento, 0 si no hay
 int hasNextWorstSeries(queriesADT queries);
 
 // Iterador de años.
