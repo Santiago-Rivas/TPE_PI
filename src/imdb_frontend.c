@@ -17,8 +17,6 @@ static void freeAllGenres(allGenres * genres);
 
 static int getGenres(char * genresField, genreList * firstGenre);
 
-static void toLowerStr(char * str);
-
 static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * genres);
 
 static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genreList * firstGenre);
@@ -53,17 +51,6 @@ static void printVotes(FILE * query, titleADT title);
 static void printRating(FILE * query, titleADT title);
 
 static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations);
-
-
-
-void printAllGenres(allGenres * genres){
-	for (int i = 0 ; i < genres->dim ; i++){
-		printf("%s\n", genres->genresName[i]);
-	}
-}
-
-
-
 
 
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){
@@ -148,7 +135,6 @@ static int readGenresFile(FILE * genresFile, allGenres * genres){
 
 		genres->nameLengths[genres->dim] = nameLen;
 
-		//toLowerStr(genres->genresName[genres->dim]);
 
 		genres->dim += 1;
 		returnGenreName = fgets(genreName, GEN_LINE_MAX_CHARS, genresFile);
@@ -278,7 +264,6 @@ static int getGenres(char * genresField, genreList * firstGenre){
 	int check= TRUE;
 	genreStr = strtok(genresField, ",");
 	while(genreStr != NULL){
-		//toLowerStr(genreStr);
 		(*firstGenre) = addGenres(*firstGenre, genreStr, &check);
 		if (check == FALSE){
 			return FALSE;
@@ -291,32 +276,22 @@ static int getGenres(char * genresField, genreList * firstGenre){
 
 static int getType(char * str){
 	
-	toLowerStr(str);
-
-	if (strcmp(str, "movie") == 0){
+	if (stringCompare(str, "movie") == 0){
 		return MOVIE;			
 	}
-	else if (strcmp(str, "short") == 0){
+	else if (stringCompare(str, "short") == 0){
 		return SHORT;
 	}
-	else if (strcmp(str, "tvseries") == 0){
+	else if (stringCompare(str, "tvseries") == 0){
 		return TV_SERIES;
 	}
-	else if (strcmp(str, "tvminiseries") == 0){
+	else if (stringCompare(str, "tvminiseries") == 0){
 		return TV_MINI_SERIES;
 	}
 	else{
 		return NO_VALID_TYPE;							//Si la obra no coincide con ningun tipo, se devuelve -1
 	}
 }
-
-static void toLowerStr(char * str){
-	for (int i = 0 ; str[i] != 0 ; i++){
-		str[i] = tolower(str[i]);
-	}
-}
-
-
 
 static int writeData(queriesADT queries, allGenres * genres){
 	FILE * fileId[TOTAL_QUERY_NUMBER] = {NULL};
@@ -555,7 +530,6 @@ static int printTitle(FILE * query,titleADT title)
 		return FALSE;
 	}
 	fprintf(query,"%s",str);
-	//printf("%s\n", str);
 	free(str);
 	return TRUE;
 }
@@ -583,7 +557,6 @@ static void printRating(FILE * query, titleADT title){
 
 static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations){
 	int dim = returnGenCount(title);
-	//printf("%d\n", dim);
 	int i;
 	int addCounter = 0;
 	int genreNum;
@@ -594,9 +567,7 @@ static void printGenres(FILE * query, titleADT title, allGenres * genres, int pr
 				fprintf(query, ",");
 			}
 			
-			//printf("%d	%d\n", i, genreNum);
 			fprintf(query, "%s", genres->genresName[genreNum]);
-			//printf("%s\n", genres->genresName[genreNum]);
 			addCounter++;
 		}
 	}
@@ -604,5 +575,3 @@ static void printGenres(FILE * query, titleADT title, allGenres * genres, int pr
 		fprintf(query, NO_ELEM_STR2);
 	}
 }
-
-

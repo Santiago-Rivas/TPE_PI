@@ -59,7 +59,6 @@ enum queries {Q1 = 0,Q2,Q3,Q4,Q5};		// Indice orotgado a cada query
 // Parametros de entrada:
 // 	titlePath: Path del archivo de titulos.
 // 	genresPath: Path del archivo de generos
-
 //	yMin: Año minmo en el cual se consideraran series para el query 4 y 5
 //	yMax: Año maxim en el cual se consideraran series para el query 4 y 5
 //	El año NO_YEAR indica que no se ingreso el parametro cuando se llamo al programa

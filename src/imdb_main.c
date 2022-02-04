@@ -1,7 +1,7 @@
 #include "imdb_frontend.h"
 
-#define MAX_ARG 4
-#define MIN_ARG 2
+#define MIN_ARG 2 													// Cantidad mínima de argumentos
+#define MAX_ARG 4													// Cantidad máxima de argumentos  
 
 static int validatePath(char * path);								// Función auxiliar que valida los paths  	
 

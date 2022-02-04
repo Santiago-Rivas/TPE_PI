@@ -185,24 +185,6 @@ int nextWorstSeries(queriesADT queries, titleADT title, int *flag);
 // Funcion de retorno para el query 1
 void returnCurrentYearQ1(queriesADT queries, unsigned int * year,unsigned int * nFilms, unsigned int * nSeries, unsigned int * nShorts);
 
-// Estas funciones no se estan utilizando. Ver abajo de todo porque
-/*
-// Funcion que retorna el nombre del
-int returnCurrentTitleName(queriesADT queries, char ** str);
-
-enum titleType returnCurrentTitleType(queriesADT queries);
-
-int returnCurrentStartYear(queriesADT queries);
-
-int returnCurrentEndYear(queriesADT queries);
-
-float returnCurrentRating(queriesADT queries);
-
-int returnCurrentVotes(queriesADT queries);
-
-int returnCurrentGenres(queriesADT queries, unsigned int index);
-*/
-
 // Funciones de liberacion de memoria:
 // freeElement libera el elemento utilizado para guardar los titulos y su informacion
 static void freeElement(pElement element);
@@ -262,8 +244,6 @@ int processData(queriesADT queries, titleADT title, genreList titleGenres, allGe
 	setFalseAnimation(queries->currentElement->title);
 
 	setGenres(queries->currentElement->title, validGenres, titleGenres);
-	//printf("%d\n", returnIsAnimation(queries->currentElement->title));
-
 	check = updateQueries(queries);									// Funcion encargada de actualizar los queries
 	
 	return check;
@@ -334,9 +314,7 @@ static int updateQueries(queriesADT queries){
 	int replaceID2 = NO_ID;
 
 	if (titleType == MOVIE) {					// El query 3 y el query 4 son en relacion a film unicamente
-		//printf("%d	%d\n", returnIsAnimation(queries->currentElement->title) == TRUE, titleVotes >= MIN_VOTES_Q2);
 		if ((returnIsAnimation(queries->currentElement->title) == TRUE) && (titleVotes >= MIN_VOTES_Q2)){ 
-			//printf("entre a q2\n");
 			check = setQuery2(queries, queries->currentElement, &replaceID1); 				// Se analiza el titulo y se actualiza el top ranking del año si es necesario (query 3)
 			if (check == NEW_TITLE_NODE_ERROR) {														// Verifica si hubo algun error de alocamiento de memoria
 				return 0;
@@ -346,8 +324,8 @@ static int updateQueries(queriesADT queries){
 		if (check == NEW_TITLE_NODE_ERROR) {													// Verifica si hubo algun error de alocamiento de memoria
 			return 0;
 		}
-	} 																			// El querry 5 y 6 son en relacion a series unciamente entre los años limites especificados
-	else if ((titleType == TV_SERIES || titleType == TV_MINI_SERIES) && (checkYearCondition(titleStartYear, titleEndYear, queries->lowerYearLimit, queries->upperYearLimit) == 1)) {
+	} 																			// El querry 4 y 5 son en relacion a series unciamente entre los años limites especificados
+	else if ((titleType == TV_SERIES || titleType == TV_MINI_SERIES) && (checkYearCondition(titleStartYear, titleEndYear, queries->lowerYearLimit, queries->upperYearLimit) == TRUE)) {
 		if (titleVotes >= MIN_VOTES_Q4){
 			check = setQuery4(queries, queries->currentElement, &replaceID1); 				// Se analiza el titulo y se actualiza el top ranking de series
 			if (check == NEW_TITLE_NODE_ERROR) {														// Verifica si hubo algun error de alocamiento de memoria
@@ -373,21 +351,21 @@ static int updateQueries(queriesADT queries){
 // Esta funcion verifica si el titulo cae dentro de los años especificados para el query 4 y el query 5
 static int checkYearCondition(int startYear, int endYear, int yMin, int yMax){
 	if (yMin == 0){
-		return 1;
+		return TRUE;
 	}
 	if ((yMax == 0) && (startYear >= yMin)){
-		return 1;
+		return TRUE;
 	}
 	if ((startYear >= yMin) && (startYear <= yMax)){
-		return 1;
+		return TRUE;
 	}
 	if ((endYear != NO_YEAR) && (endYear >= yMin) && (endYear <= yMax)){
-		return 1;
+		return TRUE;
 	}
 	if ((startYear <= yMax) && (endYear == NO_YEAR)){
-		return 1;
+		return TRUE;
 	}
-	return 0;
+	return FALSE;
 }
 
 // Funcion para agrega el currentElement al final del arreglo de pElement
@@ -524,9 +502,7 @@ static int setQuery2(queriesADT queries, pElement element, int * removeID){
 static int setQuery3(yearList currentYear, pElement element, int * removeID){
 	int flag = 0;
 	flag = rankMaker(&currentYear->topRanking, element, currentYear->rankingDim, MAX_TOP_YEAR, compareVotesNames, removeID);
-	if (flag == 1){
-		currentYear->rankingDim += 1;
-	}
+	currentYear->rankingDim += flag;
 	return flag;
 }
 
@@ -534,9 +510,7 @@ static int setQuery3(yearList currentYear, pElement element, int * removeID){
 static int setQuery4(queriesADT queries, pElement element, int * removeID){
 	int flag = 0;
 	flag = rankMaker(&queries->topSeries, element, queries->nTopSeries, MAX_TOP_SERIES, compareRatingVotes, removeID);
-	if (flag == 1){
-		queries->nTopSeries += 1;
-	}
+	queries->nTopSeries += flag;
 	return flag;
 }
 
@@ -546,13 +520,9 @@ static int setQuery4(queriesADT queries, pElement element, int * removeID){
 static int setQuery5(queriesADT queries, pElement element, int * removeID){
 	int flag = 0;
 	flag = rankMaker(&queries->worstSeries, element, queries->nWorstSeries, MAX_WORST_SERIES, compareQ5, removeID);
-	if (flag == 1){
-		queries->nWorstSeries += 1;
-	}
+	queries->nWorstSeries += flag;
 	return flag;
 }
-
-
 
 // Funcion de comparacion para los queries 2
 // Retorna:
@@ -570,7 +540,6 @@ static int compareRatingVotes(titleADT t1, titleADT t2){
 		return NEGATIVE;									// t1 < t2
 	}
 }
-
 
 // Funcion de comparacion del query 3
 // Retorna:
@@ -592,8 +561,6 @@ static int compareVotesNames(titleADT t1, titleADT t2){
 static int compareQ5(titleADT t1, titleADT t2){
 	return compareRatingVotes(t2, t1);																// Llamado de la funcion de comparacion del query 4 y query 5 pero con los titulos invertidos
 }
-
-
 
 // FUNCIONES DE RETORNO:
 // returnCurrentYearQ1 retorna la cantidad de films, series y shorts en el año en el cual apunta el iterador.
@@ -662,7 +629,7 @@ static int nextItem(titleList * nTitle,titleADT title){
 
 // Iterador de años.
 int nextYear(queriesADT queries){
-	if (hasNextYear(queries) && queries->yearIterator->nextYear != NULL){														// Verifica que haya un año actual
+	if (hasNextYear(queries) && queries->yearIterator->nextYear != NULL){			// Verifica que haya un año actual
 		queries->yearIterator = queries->yearIterator->nextYear;					// Avanza el iterador al proximo año
 		return 1; 																	// Retorna el puntero al elemento al año actual
 	}
@@ -753,37 +720,3 @@ void freeQueries(queriesADT queries){
 	freeElement(queries->currentElement);
 	free(queries);
 }
-
-
-
-// Estas son funciones que actualmetne no se estan utilizando. Si se quieren utilizar se puede cambiar la manera en la cual se devuelven los titulos al front. En vez de tener un iterador por query, utilizamos el currentElement como iterador
-/*
-int returnCurrentTitleName(queriesADT queries, char ** str){
-	return returnTitleName(queries->currentElement->title, str);
-}
-
-enum titleType returnCurrentTitleType(queriesADT queries){
-	return returnType(queries->currentElement->title);
-}
-
-int returnCurrentStartYear(queriesADT queries){
-	return returnStartYear(queries->currentElement->title);
-}
-
-int returnCurrentEndYear(queriesADT queries){
-	return returnEndYear(queries->currentElement->title);
-}
-
-float returnCurrentRating(queriesADT queries){
-	return returnRating(queries->currentElement->title);
-}
-
-int returnCurrentVotes(queriesADT queries){
-	return returnVotes(queries->currentElement->title);
-}
-
-int returnCurrentGenres(queriesADT queries, unsigned int index){
-	return returnGenre(queries->currentElement->title, index);
-}
-*/
-

@@ -8,7 +8,7 @@ typedef struct titleCDT {
 	enum titleType type;				// Tipo del titulo
 	char * primaryTitle;				// Nombre del titulo
 	unsigned int titleLen;				// Longitud del nombre del titulo
-	unsigned int maxLen;
+	unsigned int maxLen;				// Espacio máximo alocado para el primaryTitle
 	int startYear;						// Año cuando salio originalmente el titulo
 	int endYear;						// Año en el cual la serie se dejo de publicar (para peliuclas y para series que siguen sacando nuevos capitulos se utiliza NO_YEAR)
 	unsigned int genres[MAX_GENRES]; 	// Vector que contiene los indices de los generos del titulo en relacion a la estructura allGenres		
@@ -92,15 +92,6 @@ void freeGenreList(genreList list){
 // stringCompare compara dos strings ignorando mayusculas 
 int stringCompare(char * str1, char * str2){
     int c = tolower(*str1) - tolower(*str2);				// Resta entre dos letras minusculas
-
-
-    //if (*str1 == 0 || *str2 == 0){							// Se llego al final de alguno de los dos strings
-    //	return c;											// Se retorna la resta entre las dos letras actuales (al menos una de estas letras es la ultima del string)
-    //}
-    //if (c == 0){											// En el caso de que sean 
-    //    return stringCompare(str1+1, str2+1);
-    //}
-
 	if (*str1 != 0 && *str2 != 0 && c == 0){				// Ninguno de los strings se terminaron y las letras analizadas en esta recursion son la misma
 		return stringCompare(str1+1, str2+1);				// LLamada recursiva de la funcion para comparar las proximas letras
 	}
@@ -114,15 +105,12 @@ int stringCompare(char * str1, char * str2){
 // Los generos a los cual un titulo pertenece son almacenados en un arreglo estatico con un tamaño de MAX_GENRES
 // El arreglo guarda los indices de los generos al cual un titulo pertenece dentro del arreglo de nombres de generos validos de allGenres
 void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
-	//printf("%s\n", title->primaryTitle);
 	int dim = 0;																		// Cantidad de generos agregados
 	int i = 0;																			// Indice que indica que genero valido se esta analizando
 	int c;																				// Constante para guardar el resultado de comparaciones
 	while (dim<MAX_GENRES && i < MAX_GENRES && i<genres->dim && titleGenres != NULL){	// Ciclo hasta que no hayan mas genereros validos para analizar o hasta que no hayan mas generos pertenecientes al titulo
-		//printf("%s	%s\n", genres->genresName[i], titleGenres->genre);
 		if ((c = stringCompare(genres->genresName[i], titleGenres->genre)) == 0){		// Se enceuntra un genero valido dentro de la lista de generos pertenecientes a un titulo
 			if (stringCompare(titleGenres->genre, "animation") == 0){					// El titulo pertenece al genero Animation
-				//printf("is animation\n");
 				title->isAnimation = TRUE;												// Se actualiza el campo para indicar que el titulo es una animacion
 			}
 			title->genres[dim] = i;														// En el arreglo de 
@@ -262,11 +250,14 @@ float compareRating(titleADT t1, titleADT t2){
 // Funcion de liberacion:
 // freeTitle libera el espacio reservado de memoria del titleADT ingresado
 void freeTitle(titleADT title){
-	if (title->primaryTitle!=NULL)						// En el caso de que haya memoria reservada para el nombre del titulo, liberar el espacio de memoria
+	if (title !=NULL)
 	{
-		free(title->primaryTitle);
+		if (title->primaryTitle!=NULL)						// En el caso de que haya memoria reservada para el nombre del titulo, liberar el espacio de memoria
+		{
+			free(title->primaryTitle);
+		}
+		free(title);
 	}
-	free(title);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
