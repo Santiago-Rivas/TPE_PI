@@ -29,6 +29,8 @@ static int getType(char * str);
 
 static int writeData(queriesADT queries, allGenres * genres);
 
+static void closeFileId(FILE * fileId[TOTAL_QUERY_NUMBER]);
+
 static int printYearlyQueries(FILE * query1, FILE * query3, queriesADT queries, allGenres * genres,titleADT title);
 
 static void printQuery1(FILE * query1, queriesADT queries);
@@ -70,14 +72,14 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 	FILE * genresFile = fopen(genresPath, "r");
 	if (genresFile == NULL){
 		fprintf(stderr, "Error: No se logro abrir el archivo de generos\n");
-		return EXIT_FAILURE;
+		return FILE_ERROR;
 	}
 
 	FILE * titlesFile = fopen(titlePath, "r");
 	if (titlesFile == NULL){	
 		fprintf(stderr, "Error: No se logro abrir el archivo de obras\n");
 		fclose(genresFile);
-		return EXIT_FAILURE;
+		return FILE_ERROR;
 	}
 
 	allGenres genres;
@@ -85,12 +87,12 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 	genres.genresName = calloc(1, sizeof(char *) * MAX_GENRES);
 	if (genres.genresName == NULL){
 		allocError();
-		return FALSE;
+		return ALLOC_ERROR;
 	}
 	genres.nameLengths = calloc(1, sizeof(unsigned int) * MAX_GENRES);
 	if (genres.nameLengths == NULL){
 		allocError();
-		return FALSE;
+		return ALLOC_ERROR;
 	}
 	genres.dim = 0;
 
@@ -99,7 +101,7 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 
 	if (check == FALSE){
 		freeAllGenres(&genres);
-		return FALSE;
+		return ALLOC_ERROR;
 	}
 
 	fclose(genresFile);
@@ -113,14 +115,17 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 	// Lectura de obras y llamada al backend
 	queriesADT queries = newQueries(yMin, yMax);
 	if (queries == NULL){
+		fclose(titlesFile);
 		allocError();
-		return FALSE;
+		return ALLOC_ERROR;
 	}
 
 	check = readTitlesFile(titlesFile, queries, &genres);
 	if (check == FALSE){
+		fclose(titlesFile);
 		freeQueries(queries);
-		return FALSE;
+		allocError();	
+		return ALLOC_ERROR;
 	}
 
 	fclose(titlesFile);
@@ -131,7 +136,7 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 	// Liberar memoria reservada
 	freeAllGenres(&genres);
 	freeQueries(queries);
-	return TRUE;
+	return check;
 }
 
 static int readGenresFile(FILE * genresFile, allGenres * genres){
@@ -147,7 +152,6 @@ static int readGenresFile(FILE * genresFile, allGenres * genres){
 		nameLen = strlen(genreName);
 		genres->genresName[genres->dim] = malloc(sizeof(char) * nameLen + 1);
 		if (genres->genresName[genres->dim] == NULL){
-			allocError();
 			return FALSE;
 		}
 
@@ -167,7 +171,6 @@ static int readGenresFile(FILE * genresFile, allGenres * genres){
 		genres->genresName = realloc(genres->genresName, sizeof(char *) * (genres->dim));
 
 		if (genres->genresName == NULL){
-			allocError();	
 			return FALSE;
 		}
 	}	
@@ -341,12 +344,13 @@ static int writeData(queriesADT queries, allGenres * genres){
 	if (title==NULL)
 	{
 		allocError();
-		return FALSE;
+		return ALLOC_ERROR;
 	}
 	
 	char * returnFileNames[TOTAL_QUERY_NUMBER] = RETURN_FILE_NAMES;
 	char * returnFileHeaders[TOTAL_QUERY_NUMBER] = RETURN_FILE_HEADERS;
-	int check;
+	int check = TRUE;
+	int fileCheck = TRUE;
 
 	for (int i = 0 ; i < TOTAL_QUERY_NUMBER ; i++){
 		fileId[i] = fopen(returnFileNames[i], "wt");
@@ -355,36 +359,50 @@ static int writeData(queriesADT queries, allGenres * genres){
 		}
 		else{
 			fprintf(stderr,"Error: No se logró crear alguno de los archivos de retorno\n");
+			fileCheck = FILE_ERROR;
 		}
 	}
 	
 	check = printYearlyQueries(fileId[Q1], fileId[Q3], queries, genres,title);
 	if (check == FALSE)
 	{
+		closeFileId(fileId);
 		allocError();
-		return FALSE;
+		return ALLOC_ERROR;
 	}
 	check = printQuery2(fileId[Q2] ,queries, genres,title);
 	if (check == FALSE)
 	{
+		closeFileId(fileId);
 		allocError();
-		return FALSE;
+		return ALLOC_ERROR;
 	}
 	check = printQuery4(fileId[Q4], queries,title);
 	if (check == FALSE)
 	{
+		closeFileId(fileId);
 		allocError();
-		return FALSE;
+		return ALLOC_ERROR;
 	}
 	check = printQuery5(fileId[Q5], queries, genres, title);
 	if (check == FALSE)
 	{
+		closeFileId(fileId);
 		allocError();
-		return FALSE;
+		return ALLOC_ERROR;
 	}
 
 	freeTitle(title);
-	return TRUE;
+	closeFileId(fileId);
+	return fileCheck;
+}
+
+static void closeFileId(FILE * fileId[TOTAL_QUERY_NUMBER]){
+	for (int i = 0 ; i < TOTAL_QUERY_NUMBER ; i++){
+		if (fileId[i] != NULL){
+			fclose(fileId[i]);
+		}
+	}
 }
 
 

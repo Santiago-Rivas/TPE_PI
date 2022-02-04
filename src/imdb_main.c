@@ -8,7 +8,7 @@ static int validatePath(char * path);								// Función auxiliar que valida los
 int main( int argc, char *argv[] )  {
 	if( argc < MIN_ARG + 1 ) {                                  	// Se verifica que haya una mínima cantidad de argumentos
 		fprintf(stderr, "Error: Muy pocos argumentos\n");
-		return EXIT_FAILURE;
+		return INPUT_ERROR;
 	}
 	else if( argc  > MAX_ARG + 1 ) {								// Se verifica que la cantidad de argumentosno supere la cantidad máxima
 		fprintf(stderr, "Error: Demasiados argumentos\n");
@@ -17,8 +17,8 @@ int main( int argc, char *argv[] )  {
 
 	if(validatePath(argv[1])==FALSE || validatePath(argv[2])==FALSE){
 		fprintf(stderr, "Error: Paths inválidos\n");
-		return EXIT_FAILURE;
-	} 
+		return INPUT_ERROR;
+	}
 	int check, yMin, yMax;
 	int yearCheck = 1;
 	if (argc == MIN_ARG + 1){                                       // Si no se pasan años como parametros, los inicializa ambos en cero
@@ -40,16 +40,16 @@ int main( int argc, char *argv[] )  {
 
 	if (yearCheck == 0){											// Si alguno de los años es inválido, no se procesa la información
 		fprintf(stderr, "Error: Los años deben ser numeros naturales\n");
-		return EXIT_FAILURE;
+		return INPUT_ERROR;
 	}
 
 	if((argc == MAX_ARG + 1) && yMax < yMin){												// Si alguno de los años es inválido, no se procesa la información
 		fprintf(stderr, "Error: El año de inicio es mayor al de finalización\n");
-		return EXIT_FAILURE;
+		return INPUT_ERROR;
 	}
 
 	check = imdb_frontend_main(argv[1], argv[2], yMin, yMax);
-	return EXIT_SUCCESS;
+	return check == TRUE ? EXIT_SUCCESS : check;						// Si check es TRUE significa que no ocurrio ningun error. En el caso contrario significa que ocurrio un error de alocamiento o al abrir un archivo. En estos dos casos check tiene el valor asociado a ese error
 }
 
 static int validatePath(char * path){ 								//Devuelve false si el path contiene un caracter invalido de los listados a continuacion, true en caso contrario (path valido)

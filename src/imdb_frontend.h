@@ -9,6 +9,12 @@
 #include "imdb_backend_interfaces.h"
 #include "imdb_backend.h"
 
+
+// Errores posibles:
+#define INPUT_ERROR 1				// Error provocado por argumentos invalidos al programa
+#define FILE_ERROR 2				// Error provocado al abrir algun archivo
+#define ALLOC_ERROR 3				// Error provocado al alocar memoria
+
 #define SEPARATOR ";"				// Separador utilizado en los archivos csv
 
 #define TITLE_LINE_MAX_CHARS 500		// Cantidad maxima de caracteres leidos por linea en la lectura del archivo de titulos
