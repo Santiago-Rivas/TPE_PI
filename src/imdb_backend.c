@@ -60,6 +60,8 @@ typedef struct queriesCDT{
 	titleList topSeriesIterator;					// Iterar mejores series
 	titleList worstSeriesIterator;					// Iterar peores series
 
+	int lowerYearLimit;						// Año minimo para los queries 4 y 5
+	int upperYearLimit;						// Año minimo para los queries 4 y 5
 
 	// Con la nueva implementacion de updateRank se pueden sacar ya que se cuentan internamente en la funcion.
 	// El tema es que haria recursiones 5050 * 4 recursiones de mas.
@@ -83,7 +85,7 @@ static pElement newCurrentElement(unsigned int maxId);
 // La funcion retorna TRUE si todo salio bien y FALSE si hubo algun error de alocamiento de memoria
 // Parametros de entrada y salida:
 // 	queries: ADT que contiene los queries y el currentElement con el titulo que sera analizado
-static int updateQueries(queriesADT queries, int yearLowerLimit, int yearUpperLimit);
+static int updateQueries(queriesADT queries);
 
 
 // findYear encuentra el nodo de una año en partular en una lista de años. Si no lo encuentra, crea un nuevo nodo y lo agrega a la lista
@@ -222,12 +224,14 @@ void freeQueries(queriesADT queries);
 
 
 // Funcion que crea nuevos queriesADT
-queriesADT newQueries(void){
+queriesADT newQueries(int yMin, int yMax){
 	queriesADT new = calloc(1, sizeof(queriesCDT));	// Todo inicializado en 0 y NULL
+	new->lowerYearLimit = yMin;
+	new->upperYearLimit = yMax;
 	return new;
 }
 
-int processData(queriesADT queries, titleADT title, genreList titleGenres, allGenres * validGenres, int yearLowerLimit, int yearUpperLimit){
+int processData(queriesADT queries, titleADT title, genreList titleGenres, allGenres * validGenres){
 
 	if (title == NULL) {															// Se introdujo un titulo invalido
 		return TRUE;
@@ -260,7 +264,7 @@ int processData(queriesADT queries, titleADT title, genreList titleGenres, allGe
 	setGenres(queries->currentElement->title, validGenres, titleGenres);
 	//printf("%d\n", returnIsAnimation(queries->currentElement->title));
 
-	check = updateQueries(queries, yearLowerLimit, yearUpperLimit);					// Funcion encargada de actualizar los queries
+	check = updateQueries(queries);									// Funcion encargada de actualizar los queries
 	
 	return check;
 }
@@ -310,7 +314,7 @@ static yearList findYear(yearList first, int year, yearList * current){
 // Devuelve:
 // 	TRUE: Salio todo bien
 // 	FALSE: Error de alocamiento de memoria
-static int updateQueries(queriesADT queries, int yearLowerLimit, int yearUpperLimit){
+static int updateQueries(queriesADT queries){
 	unsigned int check = TRUE; 													// Verificador de error. 1: Todo salio bien. 0 Algo salio mal.
 
 	int titleStartYear = returnStartYear(queries->currentElement->title);			// Se guarda el start
@@ -343,7 +347,7 @@ static int updateQueries(queriesADT queries, int yearLowerLimit, int yearUpperLi
 			return 0;
 		}
 	} 																			// El querry 5 y 6 son en relacion a series unciamente entre los años limites especificados
-	else if ((titleType == TV_SERIES || titleType == TV_MINI_SERIES) && (checkYearCondition(titleStartYear, titleEndYear, yearLowerLimit, yearUpperLimit) == 1)) {
+	else if ((titleType == TV_SERIES || titleType == TV_MINI_SERIES) && (checkYearCondition(titleStartYear, titleEndYear, queries->lowerYearLimit, queries->upperYearLimit) == 1)) {
 		if (titleVotes >= MIN_VOTES_Q4){
 			check = setQuery4(queries, queries->currentElement, &replaceID1); 				// Se analiza el titulo y se actualiza el top ranking de series
 			if (check == NEW_TITLE_NODE_ERROR) {														// Verifica si hubo algun error de alocamiento de memoria

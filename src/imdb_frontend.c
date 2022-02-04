@@ -21,7 +21,7 @@ static void allocError();
 
 static void toLowerStr(char * str);
 
-static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * genres, unsigned int yMin, unsigned int yMax);
+static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * genres);
 
 static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genreList * firstGenre);
 
@@ -111,13 +111,13 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 
 
 	// Lectura de obras y llamada al backend
-	queriesADT queries = newQueries();
+	queriesADT queries = newQueries(yMin, yMax);
 	if (queries == NULL){
 		allocError();
 		return FALSE;
 	}
 
-	check = readTitlesFile(titlesFile, queries, &genres, yMin, yMax);
+	check = readTitlesFile(titlesFile, queries, &genres);
 	if (check == FALSE){
 		freeQueries(queries);
 		return FALSE;
@@ -192,7 +192,7 @@ static void freeAllGenres(allGenres * genres){
 
 }
 
-static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * genres, unsigned int yMin, unsigned int yMax){
+static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * genres){
 
 	char titleData[TITLE_LINE_MAX_CHARS];
 	char * returnTitleData;
@@ -216,7 +216,7 @@ static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * gen
 			freeTitle(title);				
 			return FALSE;
 		}
-		check = processData(queries, title, titleGenres, genres, yMin, yMax);
+		check = processData(queries, title, titleGenres, genres);
 		if (check == FALSE){
 			allocError();
 			freeGenreList(titleGenres);

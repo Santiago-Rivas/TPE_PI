@@ -27,7 +27,7 @@ typedef struct queriesCDT * queriesADT;
 // newQueries reserva memoria para la estructura queriesADT
 // Devuelve: 
 // queriesADT:Un puntero a la estructura, que apunta a una zona de memoria valida
-queriesADT newQueries();
+queriesADT newQueries(int yMin, int yMax);
 
 // processData se encarga de procesar cada linea leída del archivo
 // Recibe:
@@ -35,7 +35,7 @@ queriesADT newQueries();
 // title: Un puntero al ADT de la obra
 // yearLowerLimit: Representa el año minimo (para los queries 5 y 6)
 // yearLowerLimit: Representa el año máximo (para los queries 5 y 6)
-int processData(queriesADT queries, titleADT title, genreList titleGenres, allGenres * validGenres, int yearLowerLimit, int yearUpperLimit);
+int processData(queriesADT queries, titleADT title, genreList titleGenres, allGenres * validGenres);
 
 // ITERADORES:
 
