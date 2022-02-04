@@ -12,7 +12,7 @@ int main( int argc, char *argv[] )  {
 	}
 	else if( argc  > MAX_ARG + 1 ) {								// Se verifica que la cantidad de argumentosno supere la cantidad máxima
 		fprintf(stderr, "Error: Demasiados argumentos\n");
-		return EXIT_FAILURE;
+		return INPUT_ERROR;
 	}
 
 	if(validatePath(argv[1])==FALSE || validatePath(argv[2])==FALSE){
@@ -49,7 +49,18 @@ int main( int argc, char *argv[] )  {
 	}
 
 	check = imdb_frontend_main(argv[1], argv[2], yMin, yMax);
-	return (check == TRUE) ? EXIT_SUCCESS : check;						// Si check es TRUE significa que no ocurrio ningun error. En el caso contrario significa que ocurrio un error de alocamiento o al abrir un archivo. En estos dos casos check tiene el valor asociado a ese error
+	
+	if (check == ALLOC_ERROR)
+	{
+		fprintf(stderr, "Error de alocamiento\n");
+		return ALLOC_ERROR;
+	}
+	if(check == FILE_ERROR)
+	{
+		fprintf(stderr,"Error: No se logró crear alguno de los archivos de retorno\n");
+		return FILE_ERROR;
+	}
+	return EXIT_SUCCESS;
 }
 
 static int validatePath(char * path){ 								//Devuelve false si el path contiene un caracter invalido de los listados a continuacion, true en caso contrario (path valido)

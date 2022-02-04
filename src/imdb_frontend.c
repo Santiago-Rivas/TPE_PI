@@ -17,8 +17,6 @@ static void freeAllGenres(allGenres * genres);
 
 static int getGenres(char * genresField, genreList * firstGenre);
 
-static void allocError();
-
 static void toLowerStr(char * str);
 
 static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * genres);
@@ -86,12 +84,10 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 
 	genres.genresName = calloc(1, sizeof(char *) * MAX_GENRES);
 	if (genres.genresName == NULL){
-		allocError();
 		return ALLOC_ERROR;
 	}
 	genres.nameLengths = calloc(1, sizeof(unsigned int) * MAX_GENRES);
 	if (genres.nameLengths == NULL){
-		allocError();
 		return ALLOC_ERROR;
 	}
 	genres.dim = 0;
@@ -106,17 +102,10 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 
 	fclose(genresFile);
 
-
-
-	//printAllGenres(&genres);
-
-
-
 	// Lectura de obras y llamada al backend
 	queriesADT queries = newQueries(yMin, yMax);
 	if (queries == NULL){
 		fclose(titlesFile);
-		allocError();
 		return ALLOC_ERROR;
 	}
 
@@ -124,7 +113,6 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 	if (check == FALSE){
 		fclose(titlesFile);
 		freeQueries(queries);
-		allocError();	
 		return ALLOC_ERROR;
 	}
 
@@ -207,21 +195,18 @@ static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * gen
 
 	titleADT title = newTitle();
 	if (title == NULL){
-		allocError();
 		return FALSE;
 	}
 	while (returnTitleData != NULL){
 		genreList titleGenres =NULL;
 		check = readTitle(titleData, title,&titleGenres);
 		if (check == FALSE){
-			allocError();
 			freeGenreList(titleGenres);
 			freeTitle(title);				
 			return FALSE;
 		}
 		check = processData(queries, title, titleGenres, genres);
 		if (check == FALSE){
-			allocError();
 			freeGenreList(titleGenres);
 			freeTitle(title);				
 			return FALSE;
@@ -325,11 +310,6 @@ static int getType(char * str){
 	}
 }
 
-static void allocError(){
-	fprintf(stderr, "Error de alocamiento\n");
-}
-
-
 static void toLowerStr(char * str){
 	for (int i = 0 ; str[i] != 0 ; i++){
 		str[i] = tolower(str[i]);
@@ -343,14 +323,12 @@ static int writeData(queriesADT queries, allGenres * genres){
 	titleADT title = newTitle();
 	if (title==NULL)
 	{
-		allocError();
 		return ALLOC_ERROR;
 	}
 	
 	char * returnFileNames[TOTAL_QUERY_NUMBER] = RETURN_FILE_NAMES;
 	char * returnFileHeaders[TOTAL_QUERY_NUMBER] = RETURN_FILE_HEADERS;
-	int check = TRUE;
-	int fileCheck = TRUE;
+	int fileCheck = EXIT_SUCCESS;
 
 	for (int i = 0 ; i < TOTAL_QUERY_NUMBER ; i++){
 		fileId[i] = fopen(returnFileNames[i], "wt");
@@ -358,37 +336,34 @@ static int writeData(queriesADT queries, allGenres * genres){
 			fprintf(fileId[i],"%s\n",returnFileHeaders[i]);
 		}
 		else{
-			fprintf(stderr,"Error: No se logró crear alguno de los archivos de retorno\n");
 			fileCheck = FILE_ERROR;
 		}
 	}
+	
+	int check = TRUE;
 	
 	check = printYearlyQueries(fileId[Q1], fileId[Q3], queries, genres,title);
 	if (check == FALSE)
 	{
 		closeFileId(fileId);
-		allocError();
 		return ALLOC_ERROR;
 	}
 	check = printQuery2(fileId[Q2] ,queries, genres,title);
 	if (check == FALSE)
 	{
 		closeFileId(fileId);
-		allocError();
 		return ALLOC_ERROR;
 	}
 	check = printQuery4(fileId[Q4], queries,title);
 	if (check == FALSE)
 	{
 		closeFileId(fileId);
-		allocError();
 		return ALLOC_ERROR;
 	}
 	check = printQuery5(fileId[Q5], queries, genres, title);
 	if (check == FALSE)
 	{
 		closeFileId(fileId);
-		allocError();
 		return ALLOC_ERROR;
 	}
 
