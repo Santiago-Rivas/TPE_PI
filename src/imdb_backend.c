@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#define NO_ID -2
+#define NO_ID -1
 #define LIST_ALLOC_ERROR -1
 
 // Estructura para manipular titulos que se necesitan mantener en memoria dinamica
