@@ -182,6 +182,7 @@ int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, u
 	check = readTitlesFile(titlesFile, queries, &genres);
 	if (check == FALSE){
 		fclose(titlesFile);
+		freeAllGenres(&genres);
 		freeQueries(queries);
 		return ALLOC_ERROR;
 	}
