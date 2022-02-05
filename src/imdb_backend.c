@@ -39,14 +39,13 @@ typedef struct yearNode {
 	// Query 3
 	titleList topRanking;							// Mejores peliculas del año year ordenados por votos y alfabeticamente (si hay empate)
 	unsigned int rankingDim;						// Cantidad de elementos en el ranking
-	// Proximo elemento de la lista de años
-	yearList nextYear;								// Puntero al proximo nodo (año) de la lista
+	yearList nextYear;							// Puntero al proximo nodo (año) de la lista
 }yearNode;
 
 // queriesCDT es una estructura que contiene los datos necesitados por todos los queries
 typedef struct queriesCDT{
 	// Query 1, Query 3
-	yearList firstYear;								// Lista ordenada por año
+	yearList firstYear;							// Lista ordenada por año
 	// Query 2
 	titleList topAnimatedFilms;						// Lista de las mejores peliculas animadas ordenada por ranking y votos (si hay empate)
 	// Query 4
@@ -56,14 +55,14 @@ typedef struct queriesCDT{
 	// Iteradores:
 	yearList yearIterator;							// Iterar año
 	titleList yearRankingIter;						// Iterar ranking del año
-	titleList topAnimatedFilmsIterator;				// Iterar mejores peliculas animadas
-	titleList topSeriesIterator;					// Iterar mejores series
-	titleList worstSeriesIterator;					// Iterar peores series
+	titleList topAnimatedFilmsIterator;					// Iterar mejores peliculas animadas
+	titleList topSeriesIterator;						// Iterar mejores series
+	titleList worstSeriesIterator;						// Iterar peores series
 
-	int lowerYearLimit;						// Año minimo para los queries 4 y 5
-	int upperYearLimit;						// Año minimo para los queries 4 y 5
+	int lowerYearLimit;							// Año minimo para los queries 4 y 5
+	int upperYearLimit;							// Año minimo para los queries 4 y 5
 
-	unsigned int nTopAnimatedFilms;							// Cntidad de elementos en la lista de mejores peliculas
+	unsigned int nTopAnimatedFilms;						// Cntidad de elementos en la lista de mejores peliculas
 	unsigned int nTopSeries;						// Cantidad de elementos en la lista de mejores series
 	unsigned int nWorstSeries;						// Cantidad de elementos en la lista de peores serie
 	
@@ -432,12 +431,12 @@ static void setQuery1(yearList current, enum titleType type){
 	switch (type)
 	{
 		case MOVIE:
-			current->nMovies += 1;  								//Si es una film, incrementa la cantidad de peliculas en ese año
+			current->nMovies += 1;  								// Si es una film, incrementa la cantidad de peliculas en ese año
 			break;
-		case SHORT:            										//Si es un short, incrementa la cantidad de cortos en ese año
+		case SHORT:            										// Si es un short, incrementa la cantidad de cortos en ese año
 			current->nShorts += 1;
 			break;
-		case TV_SERIES:        										//Si es una serie o una mini serie, incrementa la cantidad de series en ese año
+		case TV_SERIES:        										// Si es una serie o una mini serie, incrementa la cantidad de series en ese año
 		case TV_MINI_SERIES:
 			current->nSeries += 1;
 			break;
@@ -449,14 +448,12 @@ static void setQuery1(yearList current, enum titleType type){
 // updateRank actualiza la lista que contiene a los elementos de un ranking. En el caso de que se deba devolver el indice del elemento que esta de
 static titleList updateRank(titleList first, pElement element, int (*compare) (titleADT t1, titleADT t2), int * flag, int * removeID){
 	int c;
-	if (first == NULL){
-		if (*flag == 1){
-			*flag = 0;			// No se agrego ningun elemento
-			return first;
-		}
+	if ((first == NULL) && (*flag == 1)){									// Llego al final y no hay se debe agregar un nuevo elemento a la lista
+		*flag = 0;											// No se agrego ningun elemento
+		return first;											// Retorna la lista sin modificar
 	}
-	if (first == NULL || ((c = compare(first->element->title, element->title)) <= 0)){
-		titleList new = malloc(sizeof(titleNode));
+	if (first == NULL || ((c = compare(first->element->title, element->title)) <= 0)){			// Se llego al final de la lista o se cumple la condicion para agregar un nuevo elemento a la lista
+		titleList new = malloc(sizeof(titleNode));							
 		if (new == NULL){
 			*flag = NEW_TITLE_NODE_ERROR;
 			return first;			
@@ -646,48 +643,48 @@ static int nextItem(titleList * nTitle,titleADT title){
 // Iterador de años.
 int nextYear(queriesADT queries){
 	if (hasNextYear(queries) && queries->yearIterator->nextYear != NULL){			// Verifica que haya un año actual
-		queries->yearIterator = queries->yearIterator->nextYear;					// Avanza el iterador al proximo año
-		return 1; 																	// Retorna el puntero al elemento al año actual
+		queries->yearIterator = queries->yearIterator->nextYear;			// Avanza el iterador al proximo año
+		return TRUE; 									// Retorna el puntero al elemento al año actual
 	}
 	else {
-		return 0;																	// Si no quedan mas años retorna NULL
+		return FALSE;									// Si no quedan mas años retorna NULL
 	}
 }
 
 // Iterador del top ranking de cada año (query3)
 int nextYearRanking(queriesADT queries,titleADT title, int *flag){
-	if (hasNext(queries->yearRankingIter)){													// Verifica que haya un elemento actual
+	if (hasNext(queries->yearRankingIter)){							// Verifica que haya un elemento actual
 		*flag = nextItem(&(queries->yearRankingIter),title);			
 		return *flag;
 	}
-	return 0;
+	return FALSE;
 }
 
 // Iterador para las mejores peliculas (query 4)
 int nextTopAnimatedFilms(queriesADT queries,titleADT title, int *flag){					
-	if (hasNext(queries->topAnimatedFilmsIterator)){													// Verifica que haya un elemento actual
+	if (hasNext(queries->topAnimatedFilmsIterator)){					// Verifica que haya un elemento actual
 		*flag = nextItem(&(queries->topAnimatedFilmsIterator),title);			
 		return *flag;
 	}
-	return 0;																		// Si no quedan mas elementos en el ranking retorn NULL
+	return FALSE;										// Si no quedan mas elementos en el ranking retorn NULL
 }
 
 // Iterador para las mejores series (query 5)
 int nextTopSeries(queriesADT queries,titleADT title, int * flag){
-		if (hasNext(queries->topSeriesIterator)){													// Verifica que haya un elemento actual
+		if (hasNext(queries->topSeriesIterator)){					// Verifica que haya un elemento actual
 		*flag = nextItem(&(queries->topSeriesIterator),title);			
 		return *flag;
 	}
-	return 0;
+	return FALSE;
 }
 
 // Iterador para las peores series (query 6)
 int nextWorstSeries(queriesADT queries, titleADT title, int *flag){
-	if (hasNext(queries->worstSeriesIterator)){													// Verifica que haya un elemento actual
+	if (hasNext(queries->worstSeriesIterator)){						// Verifica que haya un elemento actual
 		*flag = nextItem(&(queries->worstSeriesIterator),title);			
 		return *flag;
 	}
-	return 0;
+	return FALSE;
 }
 
 // freeElement libera el elemento utilizado para guardar los titulos y su informacion
@@ -695,7 +692,7 @@ static void freeElement(pElement element)
 {
 	if(element != NULL){
 		freeTitle(element->title);						// Libera el titulo
-		free(element);									// Libera la esttructura
+		free(element);								// Libera la esttructura
 	}
 }
 
@@ -704,7 +701,7 @@ static void freeElement(pElement element)
 static void freeList(titleList list){
 	if (list != NULL){
 		freeList(list->nextTitle);					// Llamada recursiva para llegar hasta el final
-		free(list);									// Liber el puntero al nodo
+		free(list);							// Liber el puntero al nodo
 	}
 }
 
@@ -722,17 +719,18 @@ static void freeStorage(pElement * vec,unsigned int dim)
 {
 	for (int i = 0; i < dim; i++)
 	{
-		freeElement(vec[i]);							// Libera todos los elementos del arreglo
+		freeElement(vec[i]);						// Libera todos los elementos del arreglo
 	}
-	free(vec);											// Libera el arreglo
+	free(vec);								// Libera el arreglo
 }
 
 void freeQueries(queriesADT queries){
-	freeYears(queries->firstYear);
-	freeList(queries->topAnimatedFilms);
-	freeList(queries->topSeries);
-	freeList(queries->worstSeries);
-	freeStorage(queries->storeData,queries->storageDim);
-	freeElement(queries->currentElement);
-	free(queries);
+	freeYears(queries->firstYear);						// Se libera la lista de años
+	freeList(queries->topAnimatedFilms);					// Se libera el rankking de mejores peliculas animadas
+	freeList(queries->topSeries);						// Se libera el ranking de mejores series
+	freeList(queries->worstSeries);						// Se libera el ranking de peores series
+	freeStorage(queries->storeData,queries->storageDim);			// Se libera el arreglo junto con todos los titulos que estan siendo almacenados
+	freeElement(queries->currentElement);					// Se libara el currentElement si es necesario
+	free(queries);								// Se libara queries
 }
+
