@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #define NO_ID -2
-#define NO_NEW_NODE -3
+#define LIST_ALLOC_ERROR -1
 
 // Estructura para manipular titulos que se necesitan mantener en memoria dinamica
 // El programa guardara dinamicamente solo los titulos que se necesitan en un arreglo de punteros a tElement
@@ -125,9 +125,13 @@ static int rankMaker(titleList * ranking, pElement element, unsigned int dim, in
 // 	first: Puntero de nodo de la lista que se debe analizar en la recursion actual
 // 	title: Titulo el cual se quiere agregar a la lista
 // 	compare: Puntero a la funcion de comparacion que depende de cada query
-// 	flag: Indicador de si la lista tiene la cantidad maxima de elementos posibles (determinado por la funcion rankMaker)
-// Parametro de salida:
-// 	removeID: Indice del elemento a remover del arreglo de pElements que se necesitan en los queries
+// Parametro de entrada y salida:
+// 	flag: Indicador de si la lista tiene la cantidad maxima de elementos posibles (determinado por la funcion rankMaker). 
+// 		Retorna:
+// 			TRUE si se agrego un elemento
+// 			FALSE si no se agrego un elemento o si solo se remplazo un elemento
+// 			LIST_ALLOC_ERROR si ocurrio un error de alocamiento cuando se reserva el nuevo nodo.
+// 	removeID: Indice del elemento a remover del arreglo de pElements que se necesitan en los queries. En el caso de que no se deba liberar ningun pElement la variable retorna NO_ID
 static titleList updateRank(titleList first, pElement title, int (*compare) (titleADT t1, titleADT t2), int * flag, int * removeID);
 
 // findLast es una funcion recursiva que encuentra el ultimo elemento de una lista. La funcoin es llamada solo cuando se agrega una elemento a una lista.
@@ -329,12 +333,12 @@ static int updateQueries(queriesADT queries){
 	if (titleType == MOVIE) {													// El query 2 y el query 3 son en relacion a film unicamente
 		if ((returnIsAnimation(queries->currentElement->title) == TRUE) && (titleVotes >= MIN_VOTES_Q2)){ 
 			check = setQuery2(queries, queries->currentElement, &replaceID1); 						// Se analiza el titulo y se actualiza el top ranking del año si es necesario (query 3)
-			if (check == NEW_TITLE_NODE_ERROR) {										// Verifica si hubo algun error de alocamiento de memoria
+			if (check == FALSE) {										// Verifica si hubo algun error de alocamiento de memoria
 				return FALSE;
 			}
 		}
 		check = setQuery3(current, queries->currentElement, &replaceID1);							// Se analiza el titulo y se actualiza el top ranking de films
-		if (check == NEW_TITLE_NODE_ERROR) {											// Verifica si hubo algun error de alocamiento de memoria
+		if (check == FALSE) {											// Verifica si hubo algun error de alocamiento de memoria
 			return FALSE;
 		}
 	}
@@ -344,13 +348,13 @@ static int updateQueries(queriesADT queries){
 	else if ((titleType == TV_SERIES || titleType == TV_MINI_SERIES) && (checkYearCondition(titleStartYear, titleEndYear, queries->lowerYearLimit, queries->upperYearLimit) == TRUE)) {
 		if (titleVotes >= MIN_VOTES_Q4){
 			check = setQuery4(queries, queries->currentElement, &replaceID1); 						// Se analiza el titulo y se actualiza el top ranking de series
-			if (check == NEW_TITLE_NODE_ERROR) {										// Verifica si hubo algun error de alocamiento de memoria
+			if (check == FALSE) {										// Verifica si hubo algun error de alocamiento de memoria
 				return FALSE;
 			}
 		}
 		if (titleVotes >= MIN_VOTES_Q5){
 			check = setQuery5(queries, queries->currentElement, &replaceID2); 						// Se analiza el titulo y se actualiza el worst ranking de series
-			if (check == NEW_TITLE_NODE_ERROR) {										// Verifica si hubo algun error de alocamiento de memoria
+			if (check == FALSE) {										// Verifica si hubo algun error de alocamiento de memoria
 				return FALSE;
 			}
 		}
@@ -447,84 +451,93 @@ static void setQuery1(yearList current, enum titleType type){
 
 // updateRank actualiza la lista que contiene a los elementos de un ranking. En el caso de que se deba devolver el indice del elemento que esta de
 static titleList updateRank(titleList first, pElement element, int (*compare) (titleADT t1, titleADT t2), int * flag, int * removeID){
-	int c;
-	if ((first == NULL) && (*flag == 1)){									// Llego al final y no hay se debe agregar un nuevo elemento a la lista
-		*flag = 0;											// No se agrego ningun elemento
+	int c;													// Constante para guardar el resultado de la funcion de comparacion
+	if ((first == NULL) && (*flag == TRUE)){								// Llego al final y no hay se debe agregar un nuevo elemento a la lista
+		*flag = FALSE;											// No se agrego ningun elemento
 		return first;											// Retorna la lista sin modificar
 	}
 	if (first == NULL || ((c = compare(first->element->title, element->title)) <= 0)){			// Se llego al final de la lista o se cumple la condicion para agregar un nuevo elemento a la lista
-		titleList new = malloc(sizeof(titleNode));							
-		if (new == NULL){
-			*flag = NEW_TITLE_NODE_ERROR;
-			return first;			
-		}
-		new->element = element;
-		new->nextTitle = first;
-		new->element->inUse += 1;
-		if (*flag == 1){
-			*flag=0;
-			new->nextTitle = findLast(first, removeID);
+		titleList new = malloc(sizeof(titleNode));							// Alocamiento de memoria
+		if (new == NULL){										// Error de alocamiento de memoria
+			*flag = LIST_ALLOC_ERROR;								// Indicador de error
+			return first;										// Retorna la lista intacta para que pueda ser liberada si es necesario
+		}	
+		new->element = element;										// El nuevo nodo de la lista apunta al elemento que se quiere agregar
+		new->nextTitle = first;										// Se encaden el resto de la lista con el elemento actual
+		new->element->inUse += 1;									// Se incrementa el contador que indica cuantas queries utilizan el elemento
+		if (*flag == TRUE){										// El ranking tiene cantidad maxima de elementos
+			*flag = FALSE;										// No se debe incrementar la cantidad de elementos de la lista, por que solo se esta remplazando un elemento
+			new->nextTitle = findLast(first, removeID);						// Se encuentra el ultimo elemento de la lista para desencadenarlo y liberarlo si es necsario
 		}
 		else
 		{
-			*flag = 1;
+			*flag = TRUE;										// Se agrego un nuevo elemento a la lista
 		}
-		return new;
+		return new;											// Se encadena el elemento actual con los elementos anteriores de la lista
 	}
-	if (c > 0){
+	if (c > 0){												// Todavia no se llego al final de la lista ni se llego a la condicion para agregar un elemento a la lista
 		first->nextTitle = updateRank(first->nextTitle, element, compare, flag, removeID);
 	}
-	return first;
+	return first;												// Se encadena el elemento acutal a los elementos anteriores de la lista
 }
 
+// rankMaker prepara los datos que necesita updateRank para actualizar un ranking especifico
+// Se encarga de ver si se llego a la maxima cantidad de elementos que puede tener el rank para indicarselo por medio del flag a updateRank
 static int rankMaker(titleList * ranking, pElement element, unsigned int dim, int max, int (*compare) (titleADT t1, titleADT t2), int * removeID){
 	int flag;
-	if (dim == max){
-		flag = 1;
-	} else {
-		flag = 0;
+	if (dim == max){								// Se llego a la maxima cantidad de elementos que puede tener el ranking
+		flag = TRUE;
+	} else {									// Todavia no se llego a la maxima cantidad de elementos del ranking
+		flag = FALSE;
 	}
-	*ranking = updateRank(*ranking, element, compare, &flag, removeID);
+	*ranking = updateRank(*ranking, element, compare, &flag, removeID);		// Se llama a la funcion para modificar el ranking
 	return flag;
 }
 
-static titleList findLast(titleList list, int * flag){  // Se encuentra el ultimo elemento del ranking
-	if (list->nextTitle == NULL){	                    //Caso base: si el siguiente elemento al actual es NULL (no hay)
-		list->element->inUse -= 1;                      //Se le quita un uso al elemento
-		if (list->element->inUse == 0){                 //Y si se quedo sin usos
-			*flag = list->element->id;                  //Hay que eliminarlo
-		} else {                                        //Si tiene al menos un uso no lo elimino
+// findLast encuentra el ultimo elemento del ranking
+// En el caso de que el elemento no se utiliza en ningun otro ranking se retorna el indice del elemento por medio del flag
+static titleList findLast(titleList list, int * flag){  
+	if (list->nextTitle == NULL){	               	 	    	// Caso base: si el siguiente elemento al actual es NULL (no hay)
+		list->element->inUse -= 1;                      	// Se le quita un uso al elemento
+		if (list->element->inUse == 0){                 	// Y si se quedo sin usos
+			*flag = list->element->id;                  	// Hay que eliminarlo
+		} else {                                        	// Si tiene al menos un uso no lo elimino
 			*flag = NO_ID;
 		}
-		free(list);																		// Se libera el nodo
-		return NULL;																		// Se retorna NULL indicando el nuevo ultimo elemento
+		free(list);						// Se libera el nodo
+		return NULL;						// Se retorna NULL indicando el nuevo ultimo elemento
 	}
-	list->nextTitle = findLast(list->nextTitle, flag);										// No se encuentra el ultimo elemento, se avanza al priximo elemento de la lista
+	list->nextTitle = findLast(list->nextTitle, flag);		// No se encuentra el ultimo elemento, se avanza al priximo elemento de la lista
 	return list;
 }
+
+// Las siguientes funciones setQuery son funciones intermediarias utilizadas para llamar a rankMaker
+// Cada una llama a rankMaker pasandole por parametros los datos y listas pertenecientes al query especifico
+// Ademas cada funcion se encarga de ver si se agrego un elemento a la lista, actualizando el contador si es necesario
+// La funcion retorna TRUE si todo salio bien y FALSE si hubo algun error de alocamiento
 
 // serQuery2
 static int setQuery2(queriesADT queries, pElement element, int * removeID){
 	int flag = 0;
 	flag = rankMaker(&queries->topAnimatedFilms, element, queries->nTopAnimatedFilms, MAX_TOP_ANIMATED_FILMS, compareRatingVotes, removeID);
-	queries->nTopAnimatedFilms += flag;
-	return flag;
+	queries->nTopAnimatedFilms += (flag == TRUE);
+	return flag != LIST_ALLOC_ERROR;
 }
 
 // setQuery3
 static int setQuery3(yearList currentYear, pElement element, int * removeID){
 	int flag = 0;
 	flag = rankMaker(&currentYear->topRanking, element, currentYear->rankingDim, MAX_TOP_YEAR, compareVotesNames, removeID);
-	currentYear->rankingDim += flag;
-	return flag;
+	currentYear->rankingDim += (flag == TRUE);
+	return flag != LIST_ALLOC_ERROR;
 }
 
 // serQuery4
 static int setQuery4(queriesADT queries, pElement element, int * removeID){
 	int flag = 0;
 	flag = rankMaker(&queries->topSeries, element, queries->nTopSeries, MAX_TOP_SERIES, compareRatingVotes, removeID);
-	queries->nTopSeries += flag;
-	return flag;
+	queries->nTopSeries += (flag == TRUE);
+	return flag != LIST_ALLOC_ERROR;
 }
 
 // serQuery5
@@ -533,11 +546,12 @@ static int setQuery4(queriesADT queries, pElement element, int * removeID){
 static int setQuery5(queriesADT queries, pElement element, int * removeID){
 	int flag = 0;
 	flag = rankMaker(&queries->worstSeries, element, queries->nWorstSeries, MAX_WORST_SERIES, compareQ5, removeID);
-	queries->nWorstSeries += flag;
-	return flag;
+	queries->nWorstSeries += (flag == TRUE);
+	return flag != LIST_ALLOC_ERROR;
 }
 
-// Funcion de comparacion para los queries 2
+// Funcion de comparacion para los queries 2 y 4
+// Esta funcion de comparacion compara primero por rating y a iguladad de rating, compara por numero de votos
 // Retorna:
 // > 0 si t1 > t2
 // < 0 si t1 < t2
@@ -546,15 +560,16 @@ static int compareRatingVotes(titleADT t1, titleADT t2){
 	if ((c * c) <= (ZERO * ZERO)){							// t1 y t2 son iguales
 		return compareNumVotes(t1, t2);						// Comparacion por votos
 	}
-	else if (c > 0){										// t1 > t2
+	else if (c > 0){								// t1 > t2
 		return POSITIVE;
 	}
 	else {
-		return NEGATIVE;									// t1 < t2
+		return NEGATIVE;							// t1 < t2
 	}
 }
 
 // Funcion de comparacion del query 3
+// Esta funcion de comparacion compara por numero de votos y a igualdad de votos, compara por orden alfabetico
 // Retorna:
 // > 0 si t1 > t2
 // < 0 si t1 < t2
@@ -563,16 +578,17 @@ static int compareVotesNames(titleADT t1, titleADT t2){
 	if ((c = compareNumVotes(t1, t2)) != 0){				// Comparacion por votos
 		return c;
 	} else {
-		return compareTitleNames(t1, t2);					// Comparacion por nombre
+		return compareTitleNames(t1, t2);				// Comparacion por nombre
 	}
 }
 
 // Funcion de comparacion para el query 5
+// La funcion de comparacion es opuesto al query 2 y 4
 // Retorna:
 // > 0 si t1 < t2
 // < 0 si t1 > t2
 static int compareQ5(titleADT t1, titleADT t2){
-	return compareRatingVotes(t2, t1);																// Llamado de la funcion de comparacion del query 4 y query 5 pero con los titulos invertidos
+	return compareRatingVotes(t2, t1);					// Llamado de la funcion de comparacion del query 2 y query 4 pero con los titulos invertidos
 }
 
 // FUNCIONES DE RETORNO:
@@ -583,57 +599,70 @@ void returnCurrentYearQ1(queriesADT queries, unsigned int * year,unsigned int * 
 		return;
 	}
 	*year=queries->yearIterator->year;
-	*nFilms = queries->yearIterator->nMovies; 												// Retorno de cantidad de films ese año
-	*nSeries = queries->yearIterator->nSeries;												// Retorno de cantidad de series ese año
-	*nShorts = queries->yearIterator->nShorts;												// Retorno de cantidad de shorts ese año
+	*nFilms = queries->yearIterator->nMovies; 				// Retorno de cantidad de films ese año
+	*nSeries = queries->yearIterator->nSeries;				// Retorno de cantidad de series ese año
+	*nShorts = queries->yearIterator->nShorts;				// Retorno de cantidad de shorts ese año
 }
 
 // ITERADORES:
 
+// Inicializa el iterador de años
 void toBeginYears(queriesADT queries){
 	queries->yearIterator = queries->firstYear;	
 }
 
+// Inicializa el iterador de las mejores peliculas del año encontrado en el iterador de años
 void toBeginYearRankings(queriesADT queries){
 	queries->yearRankingIter = queries->yearIterator->topRanking;
 }
 
+// Inicializa el iterador de mejores peliculas animadas
 void toBeginTopAnimatedFilms(queriesADT queries){
 	queries->topAnimatedFilmsIterator = queries->topAnimatedFilms;
 }
 
+// Inicializa el iterador de mejores series
 void toBeginTopSeries(queriesADT queries){
 	queries->topSeriesIterator = queries->topSeries;
 }
 
+// Inicializa el iterador de peores series
 void toBeginWorstSeries(queriesADT queries){
 	queries->worstSeriesIterator = queries->worstSeries;
 }
 
-int hasNextYear(queriesADT queries){
-	return queries->yearIterator != NULL;
-}
-
+// Funcion general que retorna si un titleList es null (No hay siguiente elemento en el iterador)
 static int hasNext(titleList nTitle){
 	return nTitle != NULL;
 }
 
+// Retorna si hay proximo elemento en el iterador de años
+int hasNextYear(queriesADT queries){
+	return queries->yearIterator != NULL;
+}
+
+// Retorna si hay proximo elemento en el iterador de mejores peliculas del año
 int hasNextYearRanking(queriesADT queries){
 	return hasNext(queries->yearRankingIter);
 }
 
+// Retorna si hay proximo elemento en el iterador de mejores peliculas animadas
 int hasNextTopAnimatedFilms(queriesADT queries){
 	return hasNext(queries->topAnimatedFilmsIterator);
 }
 
+// Retorna si hay proximo elemento en el iterador de mejores series
 int hasNextTopSeries(queriesADT queries){
 	return hasNext(queries->topSeriesIterator);
 }
 
+// Retorna si hay proximo elemento en el iterador de peores series
 int hasNextWorstSeries(queriesADT queries){
 	return hasNext(queries->worstSeriesIterator);
 }
 
+// nextItem copia en title el titulo del elemento actual del iterador ingresado nTitle
+// Luego avanza el iterador al proximo elemento del la lista
 static int nextItem(titleList * nTitle,titleADT title){
 	int check = titleCopy(title,(*nTitle)->element->title);
 	(*nTitle) = (*nTitle)->nextTitle;
@@ -660,7 +689,7 @@ int nextYearRanking(queriesADT queries,titleADT title, int *flag){
 	return FALSE;
 }
 
-// Iterador para las mejores peliculas (query 4)
+// Iterador para las mejores peliculas animadas (query 2)
 int nextTopAnimatedFilms(queriesADT queries,titleADT title, int *flag){					
 	if (hasNext(queries->topAnimatedFilmsIterator)){					// Verifica que haya un elemento actual
 		*flag = nextItem(&(queries->topAnimatedFilmsIterator),title);			
@@ -669,7 +698,7 @@ int nextTopAnimatedFilms(queriesADT queries,titleADT title, int *flag){
 	return FALSE;										// Si no quedan mas elementos en el ranking retorn NULL
 }
 
-// Iterador para las mejores series (query 5)
+// Iterador para las mejores series (query 4)
 int nextTopSeries(queriesADT queries,titleADT title, int * flag){
 		if (hasNext(queries->topSeriesIterator)){					// Verifica que haya un elemento actual
 		*flag = nextItem(&(queries->topSeriesIterator),title);			
@@ -678,7 +707,7 @@ int nextTopSeries(queriesADT queries,titleADT title, int * flag){
 	return FALSE;
 }
 
-// Iterador para las peores series (query 6)
+// Iterador para las peores series (query 5)
 int nextWorstSeries(queriesADT queries, titleADT title, int *flag){
 	if (hasNext(queries->worstSeriesIterator)){						// Verifica que haya un elemento actual
 		*flag = nextItem(&(queries->worstSeriesIterator),title);			
