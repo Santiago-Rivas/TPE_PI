@@ -642,7 +642,7 @@ static void printGenres(FILE * query, titleADT title, allGenres * genres, int pr
 	for (i = 0 ; i < dim ; i++){																					// Se recorren todos los generos	
 		genreNum = returnGenre(title, i);																			// Se guarda en genreNum la posición que cada genero tiene en la lista con los generos válidos
 		if (!((printAnimations == FALSE) && (stringCompare(genres->genresName[genreNum], Q2_GENRE_NAME) == 0))){
-			if (i != 0){
+			if (addCounter != 0){
 				fprintf(query, ",");
 			}
 			

@@ -237,7 +237,7 @@ int processData(queriesADT queries, titleADT title, genreList titleGenres, allGe
 	if (title == NULL) {					// Se introdujo un titulo invalido
 		return TRUE;
 	}
-	if (returnType(title) < MOVIE) {			// Titulo de tipo invalido
+	if (returnType(title) == NO_VALID_TYPE) {			// Titulo de tipo invalido
 		return TRUE;
 	}
 	if (returnVotes(title) == 0) {				// Ignorar titulos con cero votos

@@ -50,8 +50,8 @@ enum queries {Q1 = 0,Q2,Q3,Q4,Q5};		// Indice orotgado a cada query
 // Headers para cada uno de los archivos de retorno.
 // Estan ordenados segun el enum.
 #define RETURN_FILE_HEADERS {"year;films;series;shorts",\
-	"year;films;votes;rating;genres", \
-        "year;films;votes;rating;gernes", \
+	"year;film;votes;rating;genres", \
+        "year;film;votes;rating;genres", \
 	"startYear;endYear;series;votes;rating", \
 	"startYear;endYear;series;votes;rating;genres"}
 

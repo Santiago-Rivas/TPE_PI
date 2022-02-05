@@ -3,7 +3,6 @@
 
 #include "imdb_backend_interfaces.h"
 
-#define Q2_TYPES 2  		            // Cantidad de tipos que se consideraran para el query 2
 #define ZERO 0.0001   		            // Los resultados se van a devolver con dos puntos decimales
 #define POSITIVE 1                      // Para indicar valores positivos
 #define NEGATIVE -1                     // Para indicar valores negativos
@@ -14,8 +13,6 @@
 #define MIN_VOTES_Q2 20000              // Numero minimo de votos para que un titulo sea considerado en el query 2
 #define MIN_VOTES_Q4 50000              // Numero minimo de votos para que un titulo sea considerado en el query 4
 #define MIN_VOTES_Q5 5000               // Numero minimo de votos para que un titulo sea considerado en el query 5
-#define MOVIES_ROW 0                    // Fila de la matriz en donde estan guardadas la cantidad de peliculas por genero
-#define SERIES_ROW 1                    // Fila de la matriz en donde estan guardadas la cantidad de series por genero
 
 typedef struct queriesCDT * queriesADT;
 
