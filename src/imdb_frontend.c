@@ -475,7 +475,7 @@ static void printQuery1(FILE * query1, queriesADT queries)
 static int printQuery2(FILE * query2, queriesADT queries, allGenres * genres, titleADT title)
 {
 	toBeginTopAnimatedFilms(queries);
-	int errorFlag=1;
+	int errorFlag=TRUE;
 	int hasNext=hasNextTopAnimatedFilms(queries);
 	while(hasNext)
 	{
@@ -506,7 +506,7 @@ static int printQuery2(FILE * query2, queriesADT queries, allGenres * genres, ti
 static int printQuery3(FILE * query3, queriesADT queries, allGenres * genres, titleADT title)
 {
 	toBeginYearRankings(queries);
-	int errorFlag=1;
+	int errorFlag=TRUE;
 	int hasNext=hasNextYearRanking(queries);
 	while(hasNext)
 	{
@@ -536,19 +536,19 @@ static int printQuery3(FILE * query3, queriesADT queries, allGenres * genres, ti
 
 static int printQuery4(FILE * query4, queriesADT queries, titleADT title)
 {
-	toBeginTopSeries(queries);
-	int errorFlag=1;
-	int hasNext=hasNextTopSeries(queries);
-	while(hasNext)
+	toBeginTopSeries(queries);											// Inicializa el iterador que recorrerá la lista
+	int errorFlag=TRUE;													// Si errorFlag es 0, entonces hubo un error. Si no hubo errores vale 1
+	int hasNext=hasNextTopSeries(queries);								// Si hasNext es 1, entonces hay una serie siguiente. Si no hay es 0
+	while(hasNext)														// Mientras haya una serie siguiente en la lista
 	{
-		hasNext=nextTopSeries(queries,title,&errorFlag);
-		if(errorFlag == FALSE)
+		hasNext=nextTopSeries(queries,title,&errorFlag);				// Se verifica que haya una serie siguiente en la lista
+		if(errorFlag == FALSE)											// Si hubo error
 		{
-			return FALSE;
+			return FALSE;												// Retorna FALSE
 		}
-		printStartYear(query4, title);
-		PRINT_SEPARATOR(query4)
-		printEndYear(query4, title);
+		printStartYear(query4, title);									// Imprime el año de comienzo de la obra en el archivo de respuesta 
+		PRINT_SEPARATOR(query4)											// Imprmime en el archivo de respuesta un separador para identificar cuando termina un campo
+		printEndYear(query4, title);									// Imprime el año de finalización de la obra en el archivo de respuesta
 		PRINT_SEPARATOR(query4)
 		errorFlag = printTitle(query4,title);
 		if(errorFlag == FALSE)
@@ -567,79 +567,79 @@ static int printQuery4(FILE * query4, queriesADT queries, titleADT title)
 
 static int printQuery5(FILE * query5, queriesADT queries,allGenres * genres, titleADT title) 
 {
-	toBeginWorstSeries(queries);
-	int errorFlag=1;
-	int hasNext=hasNextWorstSeries(queries);
-	while(hasNext)
+	toBeginWorstSeries(queries);									// Inicializa el iterador que recorrerá la lista 
+	int errorFlag=TRUE;												// Si errorFlag es 0, entonces hubo un error. Si no hubo errores vale 1
+	int hasNext=hasNextWorstSeries(queries);						// Si hasNext es 1, entonces hay una serie siguiente. Si no hay es 0
+	while(hasNext)													// Mientras haya una serie siguiente en la lista
 	{
-		hasNext=nextWorstSeries(queries,title,&errorFlag);
-		if(errorFlag == FALSE)
+		hasNext=nextWorstSeries(queries,title,&errorFlag);			// Se verifica que haya una serie siguiente en la lista
+		if(errorFlag == FALSE)										// Si hubo un error
 		{
-			return FALSE;
+			return FALSE;											// Retorna FALSE
 		}
-		printStartYear(query5, title);
-		PRINT_SEPARATOR(query5)
-		printEndYear(query5, title);
-		PRINT_SEPARATOR(query5)
-		errorFlag = printTitle(query5, title);
-		if(errorFlag == FALSE)
+		printStartYear(query5, title);								// Imprime el año de comienzo de la obra en el archivo de respuesta 
+		PRINT_SEPARATOR(query5)										// Imprmime en el archivo de respuesta un separador para identificar cuando termina un campo
+		printEndYear(query5, title);								// Imprime el año de finalización de la obra en el archivo de respuesta
+		PRINT_SEPARATOR(query5)										// Imprmime en el archivo de respuesta un separador para identificar cuando termina un campo
+		errorFlag = printTitle(query5, title);						// Imprime el titulo de la obra en el archivo de respuesta
+		if(errorFlag == FALSE)										// Si hubo error
 		{
-			return FALSE;
+			return FALSE;											// Retorna FALSE
 		}
-		PRINT_SEPARATOR(query5)
-		printVotes(query5, title);
-		PRINT_SEPARATOR(query5)
-		printRating(query5, title);
-		PRINT_SEPARATOR(query5);
-		printGenres(query5, title, genres, TRUE);
-		PRINT_ENTER(query5)
-		hasNext = hasNextWorstSeries(queries);
+		PRINT_SEPARATOR(query5)										// Imprmime en el archivo de respuesta un separador para identificar cuando termina un campo
+		printVotes(query5, title);									// Imprime la cantidad de votos de la obra en el archivo de respuesta
+		PRINT_SEPARATOR(query5)										// Imprmime en el archivo de respuesta un separador para identificar cuando termina un campo
+		printRating(query5, title);									// Imprime el rating de la obra en el archivo de respuesta
+		PRINT_SEPARATOR(query5);									// Imprmime en el archivo de respuesta un separador para identificar cuando termina un campo
+		printGenres(query5, title, genres, TRUE);					// Imprime los generos de la obra en el archivo de respuesta
+		PRINT_ENTER(query5)											// Imprmime en el archivo de respuesta un newLine para identificar el fin de la query
+		hasNext = hasNextWorstSeries(queries);						// Se verifica que haya una serie siguiente en la lista
 	}
-	return TRUE;
+	return TRUE;													// Si no hubo ningún error, devuelve TRUE
 }
 
 static int printTitle(FILE * query,titleADT title)
 {
 	char * str = NULL;
 	int check;
-	check = returnTitleName(title,&str);
-	if(check == FALSE)
+	check = returnTitleName(title,&str);        // En str queda una copia del titulo de la obra
+	if(check == FALSE)							// Si check es FALSE, entonces hubo un error
 	{
-		return FALSE;
+		return FALSE;   
 	}
-	fprintf(query,"%s",str);
-	free(str);
+	fprintf(query,"%s",str);					// Se imprime en el archivo de respuesta el titulo de la obra
+	free(str);									// Se libera el string que se uso para guardar el titulo
 	return TRUE;
 }
 
 static void printStartYear(FILE * query, titleADT title){
-	fprintf(query, "%d", returnStartYear(title));
+	fprintf(query, "%d", returnStartYear(title));  		// Imprime en el archivo el año de comienzo de la obra
 }
 
 static void printEndYear(FILE * query, titleADT title){
-	int year = returnEndYear(title);
-	if (year <= NO_YEAR){
-		fprintf(query, NO_ELEM_STR2);
+	int year = returnEndYear(title);  			// En year se guarda el año de finalización de la obra
+	if (year <= NO_YEAR){						// Si no es un año válido
+		fprintf(query, NO_ELEM_STR2);			// Se imprime en el archivo de respuesta un "\N" en el campo del año de finalización
 	} else{
-		fprintf(query, "%d", year);
+		fprintf(query, "%d", year); 			// En cambio, is el año es válido se imprime ese año en el archivo de respuesta
 	}
 }
 
 static void printVotes(FILE * query, titleADT title){
-	fprintf(query, "%d", returnVotes(title));
+	fprintf(query, "%d", returnVotes(title));        // Imprime en el archivo la cantidad de votos de la obra
 }
 
 static void printRating(FILE * query, titleADT title){
-	fprintf(query, "%0.1f", returnRating(title));
+	fprintf(query, "%0.1f", returnRating(title));  // Imprime en el archivo el rating de la obra
 }
-
+// Falta comentar
 static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations){
-	int dim = returnGenCount(title);
+	int dim = returnGenCount(title);    																			// En dim se guarda la cantidad de generos de la obra
 	int i;
 	int addCounter = 0;
 	int genreNum;
-	for (i = 0 ; i < dim ; i++){
-		genreNum = returnGenre(title, i);
+	for (i = 0 ; i < dim ; i++){																					// Se recorren todos los generos	
+		genreNum = returnGenre(title, i);																			// Se guarda en genreNum la posición que cada genero tiene en la lista con los generos válidos
 		if (!((printAnimations == FALSE) && (stringCompare(genres->genresName[genreNum], Q2_GENRE_NAME) == 0))){
 			if (i != 0){
 				fprintf(query, ",");
