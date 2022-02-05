@@ -21,54 +21,118 @@ static void freeAllGenres(allGenres * genres);
 static int getGenres(char * genresField, genreList * firstGenre);
 
 // readTitlesFile se encarga de leer el archivo imdb.csv
+// Parametros de entrada:
+// titlesFile: es un puntero al archivo de obras (imdb.csv)
+// queries: es un puntero a la estructura donde se almacena lo necesario para cada query
+// genres: es la estructura con la lista de generos válidos
+// Parametros de Salida:
+// Retorna 1 si no hubo errores, 0 si hubo algún error
 static int readTitlesFile(FILE * titlesFile, queriesADT queries, allGenres * genres);
 
-
+// readTitle se encarga de leer el archivo imdb.csv
+// Parametros de entrada:
+// titleData: vector donde se guarda cada línea del archivo
+// title: puntero a la estructura en donde se guardan los datos de cada obra
+// firstGenre: puntero a la lista ed generos de una obra
+// Parametros de Salida:
+// Retorna 1 si no hubo errores, 0 si hubo algún error
 static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genreList * firstGenre);
 
-
+// getType obtiene el tipo de obra
+// Parametros de Entrada:
+// str: string con el tipo de obra
+// Parametros de Salida:
+// Retorna un entero que hace referencia a algun tipo de obra según un enum
 static int getType(char * str);
 
-
+// writeData se encarga de crear los archivos de respuesta y llenarlos con los datos de cada query
+// Parametros de Entrada:
+// queries: puntero a la estructura donde se almacena lo necesario para cada query
+// genres: puntero a la estructura con la lista de generos válidos
+// Parametros de Salida:
+// Retorna un entero según el tipo de error, o 0 si no hubo errores
 static int writeData(queriesADT queries, allGenres * genres);
 
-
+// closeFileId se encarga de cerrar los archivos de respuesta
+// Parametros de Entrada:
+// fileID: es un vector de punteros a los archivos de respuesta
 static void closeFileId(FILE * fileId[TOTAL_QUERY_NUMBER]);
 
-
+// printYearlyQueries se encarga de imprimir aquellos archivos de respuesta que son iterados por año (query 1 y query 3)
+// Parametros de Entrada:
+// query1: puntero al archivo de respuesta del query1
+// query3: puntero al archivo de respuesta del query3
+// queries: puntero a la estructura donde se almacena lo necesario para cada query
+// genres: puntero a la estructura con la lista de generos válidos
+// title: puntero a la estructura en donde se guardan los datos de cada obra
 static int printYearlyQueries(FILE * query1, FILE * query3, queriesADT queries, allGenres * genres,titleADT title);
 
-
+// printQuery1 se encarga de imprimir en el archivo de respuesta los datos de la query1
+// Parametros de Entrada:
+// query1: puntero al archivo de respuesta del query1
+// queries: puntero a la estructura donde se almacena lo necesario para cada query
 static void printQuery1(FILE * query1, queriesADT queries);
 
-
+// printQuery2 se encarga de imprimir en el archivo de respuesta los datos de la query2
+// Parametros de Entrada:
+// query2: puntero al archivo de respuesta del query2
+// queries: puntero a la estructura donde se almacena lo necesario para cada query
 static int printQuery2(FILE * query2, queriesADT queries, allGenres * genres, titleADT title);
 
-
+// printQuery3 se encarga de imprimir en el archivo de respuesta los datos de la query3
+// Parametros de Entrada:
+// query3: puntero al archivo de respuesta del query3
+// queries: puntero a la estructura donde se almacena lo necesario para cada query
 static int printQuery3(FILE * query3, queriesADT queries, allGenres * genres, titleADT title);
 
-
+// printQuery4 se encarga de imprimir en el archivo de respuesta los datos de la query4
+// Parametros de Entrada:
+// query4: puntero al archivo de respuesta del query4
+// queries: puntero a la estructura donde se almacena lo necesario para cada query
 static int printQuery4(FILE * query4, queriesADT queries, titleADT title);
 
-
+// printQuery5 se encarga de imprimir en el archivo de respuesta los datos de la query5
+// Parametros de Entrada:
+// query5: puntero al archivo de respuesta del query5
+// queries: puntero a la estructura donde se almacena lo necesario para cada query
 static int printQuery5(FILE * query5, queriesADT queries, allGenres * genres, titleADT title);
 
-
+// printTitle se encarga de imprimir en los archivos de respuesta el titulo de la obra
+// Parametros de Entrada:
+// query: puntero al archivo de respuesta
+// title: puntero a la estructura en donde se guardan los datos de cada obra
 static int printTitle(FILE * query,titleADT title);
 
-
+// printStartYear se encarga de imprimir en los archivos de respuesta el año de comienzo de la obra
+// Parametros de Entrada:
+// query: puntero al archivo de respuesta
+// title: puntero a la estructura en donde se guardan los datos de cada obra
 static void printStartYear(FILE * query, titleADT title);
 
-
+// printEndYear se encarga de imprimir en los archivos de respuesta el año de finalización de la obra
+// Parametros de Entrada:
+// query: puntero al archivo de respuesta
+// title: puntero a la estructura en donde se guardan los datos de cada obra
 static void printEndYear(FILE * query, titleADT title);
 
-
+// printVotes se encarga de imprimir en los archivos de respuesta la cantidad de votos de la obra
+// Parametros de Entrada:
+// query: puntero al archivo de respuesta
+// title: puntero a la estructura en donde se guardan los datos de cada obra
 static void printVotes(FILE * query, titleADT title);
 
-
+// printRating se encarga de imprimir en los archivos de respuesta el rating de la obra
+// Parametros de Entrada:
+// query: puntero al archivo de respuesta
+// title: puntero a la estructura en donde se guardan los datos de cada obra
 static void printRating(FILE * query, titleADT title);
 
-
+// printGenres se encarga de imprimir los generos asociados a cada obra
+// Parametros de Entrada:
+// query: puntero al archivo de respuesta
+// title: puntero a la estructura en donde se guardan los datos de cada obra
+// genres: puntero a la estructura con la lista de generos válidos
+// printAnimations: entero que se encarga de controlar si la pelicula es o no animada
 static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations);
 
 
