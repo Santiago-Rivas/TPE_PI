@@ -19,8 +19,8 @@ enum titleType {MOVIE = 0, SHORT, TV_SERIES, TV_MINI_SERIES}; 	// Enum con los t
 
 typedef struct allGenres {		//Estructura con todos los generos
 	char ** genresName;			//Vector de strings de los generos
-	unsigned int * nameLengths;
-	unsigned int dim;			//Dimension del vector
+	unsigned int * nameLengths; // Vector de enteros que indica la longitud de cada género
+	unsigned int dim;			//Dimension de los vectores
 } allGenres;
 
 typedef struct genreNode * genreList;	//Lista de generos de un titulo
