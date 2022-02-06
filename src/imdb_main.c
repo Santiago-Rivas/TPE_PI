@@ -50,17 +50,31 @@ int main( int argc, char *argv[] )  {
 
 	check = imdb_frontend_main(argv[1], argv[2], yMin, yMax);
 	
-	if (check == ALLOC_ERROR)
+	switch(check)
 	{
-		fprintf(stderr, "Error de alocamiento\n");
-		return ALLOC_ERROR;
+		case TRUE: 
+			return EXIT_SUCCESS;
+			break;
+
+		case ALLOC_ERROR: 		
+			fprintf(stderr, "Error de alocamiento\n");
+			break;
+
+		case TITLE_FILE_ERROR:
+			fprintf(stderr, "Error: No se logro abrir el archivo de obras\n");					// Se imprimie en la salida de error un mensaje explicando el error
+			break;
+
+		case GENRES_FILE_ERROR:
+			fprintf(stderr, "Error: No se logro abrir el archivo de generos\n");				// Se imprimie en la salida de error un mensaje explicando el error
+			break;
+
+		case RETURN_FILE_ERROR:
+			fprintf(stderr,"Error: No se logró crear alguno de los archivos de retorno\n");		// Se imprimie en la salida de error un mensaje explicando el error
+			break;
+		default:
+			break;
 	}
-	if(check == FILE_ERROR)
-	{
-		fprintf(stderr,"Error: No se logró crear alguno de los archivos de retorno\n");
-		return FILE_ERROR;
-	}
-	return EXIT_SUCCESS;
+	return check;
 }
 
 static int validatePath(char * path){ 								//Devuelve false si el path contiene un caracter invalido de los listados a continuacion, true en caso contrario (path valido)

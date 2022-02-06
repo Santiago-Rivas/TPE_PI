@@ -158,15 +158,13 @@ static int printQueries(FILE * query, queriesADT queries,allGenres * genres, tit
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){
 	FILE * genresFile = fopen(genresPath, "r");											// Se abre el archivo de generos
 	if (genresFile == NULL){															// Si no se pudo abrir
-		fprintf(stderr, "Error: No se logro abrir el archivo de generos\n");			// Se imprimie en la salida de error un mensaje explicando el error
-		return FILE_ERROR;																// Retorna que hubo un error en los archivos
+		return GENRES_FILE_ERROR;														// Retorna que hubo un error en los archivos
 	}
 
 	FILE * titlesFile = fopen(titlePath, "r");											// Se abre el archivo de obras
 	if (titlesFile == NULL){															// Si no se pudo abrir
-		fprintf(stderr, "Error: No se logro abrir el archivo de obras\n");				// Se imprimie en la salida de error un mensaje explicando el error
 		fclose(genresFile);																// Se cierra el archivo de generos que quedó abierto
-		return FILE_ERROR;																// Retorna que hubo un error en los archivos
+		return TITLE_FILE_ERROR;														// Retorna que hubo un error en los archivos
 	}
 
 	allGenres genres;																	// Se crea una estructura para guardar los géneros válidos
@@ -414,7 +412,7 @@ static int writeData(queriesADT queries, allGenres * genres){
 			fprintf(fileId[i],"%s\n",returnFileHeaders[i]);					// Se imprimie el encabezado correspondiente
 		}
 		else{
-			fileCheck = FILE_ERROR;											// Si no se pudo crear, en fileCheck se guarda que hubo un error de alocamiento
+			fileCheck = RETURN_FILE_ERROR;											// Si no se pudo crear, en fileCheck se guarda que hubo un error de alocamiento
 		}
 	}
 	
@@ -481,8 +479,7 @@ static int printYearlyQueries(FILE * query1, FILE * query3, queriesADT queries, 
 		}
 		hasYear=nextYear(queries);									// Se verifica que haya un elemento siguiente
 	}
-
-	return TRUE;
+	return TRUE;													// Si no hubo errores, retorna 1
 }
 
 static void printQuery1(FILE * query1, queriesADT queries)
@@ -592,22 +589,22 @@ static void printRating(FILE * query, titleADT title){
 }
 
 static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations){
-	int dim = returnGenCount(title);    																			// En dim se guarda la cantidad de generos de la obra
+	int dim = returnGenCount(title);    																				// En dim se guarda la cantidad de generos de la obra
 	int i;
-	int addCounter = 0;																								// Indica la cantidad de géneros que se agregaron
+	int addCounter = 0;																									// Indica la cantidad de géneros que se agregaron
 	int genreNum;
-	for (i = 0 ; i < dim ; i++){																					// Va desde 0 hasta la cantidad de generos de esa obra
-		genreNum = returnGenre(title, i);																			// Se guarda en genreNum la dimensión del arreglo con los generos de cada obra
-		if (!((printAnimations == FALSE) && (stringCompare(genres->genresName[genreNum], Q2_GENRE_NAME) == 0))){	// Se verifica si hay que imprimir o no el género "animation"
-			if (addCounter != 0){																					// Si no es el 1° género que se agrega
-				fprintf(query, ",");																				// Imprime en el archivo de respuesta una coma (que separa cada género)
+	for (i = 0 ; i < dim ; i++){																						// Va desde 0 hasta la cantidad de generos de esa obra
+		genreNum = returnGenre(title, i);																				// Se guarda en genreNum la dimensión del arreglo con los generos de cada obra
+		if (((printAnimations == TRUE) || (stringCompare(genres->genresName[genreNum], Q2_GENRE_NAME) != 0))){			// Se verifica si hay que imprimir o no el género "animation"
+			if (addCounter != 0){																						// Si no es el 1° género que se agrega
+				fprintf(query, ",");																					// Imprime en el archivo de respuesta una coma (que separa cada género)
 			}
 			
-			fprintf(query, "%s", genres->genresName[genreNum]);														// Imprime el género en el archivo de respuesta							
-			addCounter++;																							// Incrementa el contador de géneros
+			fprintf(query, "%s", genres->genresName[genreNum]);															// Imprime el género en el archivo de respuesta							
+			addCounter++;																								// Incrementa el contador de géneros
 		}
 	}
-	if (addCounter == 0){																							// Si no hay ningún género
-		fprintf(query, NO_ELEM_STR2);																				// Se imprime en el archivo de respuesta el indicador de campo vacío (\N)
+	if (addCounter == 0){																								// Si no hay ningún género
+		fprintf(query, NO_ELEM_STR2);																					// Se imprime en el archivo de respuesta el indicador de campo vacío (\N)
 	}
 }

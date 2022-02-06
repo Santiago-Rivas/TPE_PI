@@ -12,8 +12,10 @@
 
 // Errores posibles:
 #define INPUT_ERROR 1				// Error provocado por argumentos invalidos al programa
-#define FILE_ERROR 2				// Error provocado al abrir algun archivo
-#define ALLOC_ERROR 3				// Error provocado al alocar memoria
+#define ALLOC_ERROR 2				// Error provocado al alocar memoria
+#define TITLE_FILE_ERROR 3			// Error provocado al abrir algun archivo
+#define GENRES_FILE_ERROR 4			// Error provocado al abrir algun archivo
+#define RETURN_FILE_ERROR 5			// Error provocado al abrir algun archivo
 
 #define SEPARATOR ";"				// Separador utilizado en los archivos csv
 
