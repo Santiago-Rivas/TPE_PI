@@ -106,14 +106,14 @@ static int printQuery5(FILE * query5, queriesADT queries, allGenres * genres, ti
 // Parametros de entrada:
 // query: puntero al archivo de respuesta
 // queries: puntero a la estructura donde se almacena lo necesario para cada query
-// genres: puntero a la estructura con la lista de generos válidos. Si no se deben imprimir los generos en algún query, el puntero vale NULL
+// genres: puntero a la estructura con el arreglo de generos válidos. Si no se deben imprimir los generos en algún query, el puntero vale NULL
 // title: puntero a la estructura en donde se guardan los datos de cada obra
-// isSeries: vale 1 si se trata de series (como el caso de las queries 4 y 5), o 0 si se trata de peliculas (como el caso de las queries 2 y 3)
-// showAnimation: vale 1 si se debe mostrar el genero "Animation", o 0 si debe omitirse (como es el caso de la query 2)
-// hasNextFunction: es un puntero a función, dependiendo de la query a mostrar se le pasa el iterador correspondiente a la lista
-// nextFunction: es un puntero a función, dependiendo de la query a mostrar se le pasa el iterador correspondiente a la lista
+// isSeries: vale TRUE si se trata de series (como el caso de las queries 4 y 5), o FALSE si se trata de peliculas (como el caso de las queries 2 y 3)
+// showAnimation: vale TRUE si se debe mostrar el genero "Animation", o FALSE si debe omitirse (como es el caso de la query 2)
+// hasNextFunction: es un puntero a función, dependiendo de la query a mostrar se le pasa la funcion correspondiente
+// nextFunction: es un puntero a función, dependiendo de la query a mostrar se le pasa la funcion correspondiente
 // Parametros de Salida:
-// Retorna un 1 si no hubo errores, 0 si se produjo algún error
+// Retorna un TRUE si no hubo errores, FALSE si se produjo algún error de alocamiento
 static int printQueries(FILE * query, queriesADT queries,allGenres * genres, titleADT title, int isSeries, int showAnimation, int (*hasNextFunction) (queriesADT queries), int (*nextFunction)(queriesADT queries,titleADT title, int *flag));
 
 // printTitle se encarga de imprimir en los archivos de respuesta el titulo de la obra
