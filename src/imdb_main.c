@@ -3,7 +3,11 @@
 #define MIN_ARG 2 													// Cantidad mínima de argumentos
 #define MAX_ARG 4													// Cantidad máxima de argumentos  
 
-static int validatePath(char * path);								// Función auxiliar que valida los paths  	
+// Función auxiliar que valida los paths  	
+static int validatePath(char * path);
+
+// Funcion que verifica que el parametro ingresado como año sea un numero entero
+static int validateYear(char * year);
 
 int main( int argc, char *argv[] )  {
 	if( argc < MIN_ARG + 1 ) {                                  	// Se verifica que haya una mínima cantidad de argumentos
@@ -20,25 +24,24 @@ int main( int argc, char *argv[] )  {
 		return INPUT_ERROR;
 	}
 	int check, yMin, yMax;
-	int yearCheck = 1;
+	int yearCheck = TRUE;
 	if (argc == MIN_ARG + 1){                                       // Si no se pasan años como parametros, los inicializa ambos en cero
 		yMin = 0;
 		yMax = 0;
 	}
 	if (argc > MIN_ARG + 1){										// Verifica que se pase un año de inicio válido
-		if ((yMin = atoi(argv[3])) <= 0){
-			yearCheck = 0;
+		if ((validateYear(argv[3]) == FALSE) || ((yMin = atoi(argv[3])) <= 0)){
+			yearCheck = FALSE;
 		}
 
 	}
 	if (argc == MAX_ARG + 1){										// Verifica que se pase un año de inicio válido
-		yMax = atoi(argv[4]);
-		if ((yMax = atoi(argv[4])) <= 0){
-			yearCheck = 0;
+		if ((validateYear(argv[4]) == FALSE) || (yMax = atoi(argv[4])) <= 0){
+			yearCheck = FALSE;
 		}
 	}
 
-	if (yearCheck == 0){											// Si alguno de los años es inválido, no se procesa la información
+	if (yearCheck == FALSE){											// Si alguno de los años es inválido, no se procesa la información
 		fprintf(stderr, "Error: Los años deben ser numeros naturales\n");
 		return INPUT_ERROR;
 	}
@@ -89,3 +92,14 @@ static int validatePath(char * path){ 								//Devuelve false si el path contie
     }
     return validatePath(path + 1); 									//Si no sucedio nada de lo anterior, continuar leyendo el path por el siguiente caracter
 }
+
+static int validateYear(char * year){
+        for (int i = 0 ; year[i] != 0 ; i++){
+                if (isdigit(year[i]) == 0){
+                        return FALSE;                                                                                                                                         }
+        }
+        return TRUE;
+}
+
+
+

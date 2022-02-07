@@ -36,7 +36,7 @@ Contenido:
 		./imdb /PATH/ARCHIVO/OBRAS.csv /PATH/ARCHIVO/GÉNEROS.csv 2000 
 	Si se utilizan dos parámetros opcionales, el query 4 y 5 analizaran series que hayan tenido al menos una temporada entre el rango de años introducido. En el siguiente ejemplo se consideran las series que sacaron alguna temporada entre los años 2000 y 2001:
 		./imdb /PATH/ARCHIVO/OBRAS.csv /PATH/ARCHIVO/GÉNEROS.csv 2000 2001
-	Nota: Si se introduce un numero decimal como año, se utilizara solamente la parte entera de ese numero.		
+
 
 3) Salida del programa:
 	El programa generará cinco archivos .csv, uno por cada query solicitada:

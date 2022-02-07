@@ -102,6 +102,20 @@ static int printQuery4(FILE * query4, queriesADT queries, titleADT title);
 // queries: puntero a la estructura donde se almacena lo necesario para cada query
 static int printQuery5(FILE * query5, queriesADT queries, allGenres * genres, titleADT title);
 
+// printQueries se encarga de imprimir en los archivos de respuesta, los resultados de las queries 2 a 5
+// Parametros de entrada:
+// query: puntero al archivo de respuesta
+// queries: puntero a la estructura donde se almacena lo necesario para cada query
+// genres: puntero a la estructura con la lista de generos válidos. Si no se deben imprimir los generos en algún query, el puntero vale NULL
+// title: puntero a la estructura en donde se guardan los datos de cada obra
+// isSeries: vale 1 si se trata de series (como el caso de las queries 4 y 5), o 0 si se trata de peliculas (como el caso de las queries 2 y 3)
+// showAnimation: vale 1 si se debe mostrar el genero "Animation", o 0 si debe omitirse (como es el caso de la query 2)
+// hasNextFunction: es un puntero a función, dependiendo de la query a mostrar se le pasa el iterador correspondiente a la lista
+// nextFunction: es un puntero a función, dependiendo de la query a mostrar se le pasa el iterador correspondiente a la lista
+// Parametros de Salida:
+// Retorna un 1 si no hubo errores, 0 si se produjo algún error
+static int printQueries(FILE * query, queriesADT queries,allGenres * genres, titleADT title, int isSeries, int showAnimation, int (*hasNextFunction) (queriesADT queries), int (*nextFunction)(queriesADT queries,titleADT title, int *flag));
+
 // printTitle se encarga de imprimir en los archivos de respuesta el titulo de la obra
 // Parametros de Entrada:
 // query: puntero al archivo de respuesta
@@ -140,19 +154,8 @@ static void printRating(FILE * query, titleADT title);
 // printAnimations: entero que se encarga de controlar si la pelicula es o no animada
 static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations);
 
-// printQueries se encarga de imprimir en los archivos de respuesta, los resultados de las queries
-// Parametros de entrada:
-// query: puntero al archivo de respuesta
-// queries: puntero a la estructura donde se almacena lo necesario para cada query
-// genres: puntero a la estructura con la lista de generos válidos. Si no se deben imprimir los generos en algún query, el puntero vale NULL
-// title: puntero a la estructura en donde se guardan los datos de cada obra
-// isSeries: vale 1 si se trata de series (como el caso de las queries 4 y 5), o 0 si se trata de peliculas (como el caso de las queries 2 y 3)
-// showAnimation: vale 1 si se debe mostrar el genero "Animation", o 0 si debe omitirse (como es el caso de la query 2)
-// hasNextFunction: es un puntero a función, dependiendo de la query a mostrar se le pasa el iterador correspondiente a la lista
-// nextFunction: es un puntero a función, dependiendo de la query a mostrar se le pasa el iterador correspondiente a la lista
-// Parametros de Salida:
-// Retorna un 1 si no hubo errores, 0 si se produjo algún error
-static int printQueries(FILE * query, queriesADT queries,allGenres * genres, titleADT title, int isSeries, int showAnimation, int (*hasNextFunction) (queriesADT queries), int (*nextFunction)(queriesADT queries,titleADT title, int *flag));
+
+/// Funciones ///
 
 
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){
@@ -608,3 +611,4 @@ static void printGenres(FILE * query, titleADT title, allGenres * genres, int pr
 		fprintf(query, NO_ELEM_STR2);																					// Se imprime en el archivo de respuesta el indicador de campo vacío (\N)
 	}
 }
+
