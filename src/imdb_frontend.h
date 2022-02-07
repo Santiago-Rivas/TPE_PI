@@ -64,6 +64,13 @@ enum queries {Q1 = 0,Q2,Q3,Q4,Q5};		// Indice orotgado a cada query
 //	yMin: Año minmo en el cual se consideraran series para el query 4 y 5
 //	yMax: Año maxim en el cual se consideraran series para el query 4 y 5
 //	El año NO_YEAR indica que no se ingreso el parametro cuando se llamo al programa
+// La funcion retorna:
+// 	TRUE: Si salio todo bien
+// 	ALLOC_ERROR: Si ocurrio un error de alocamiento.
+// 	TITLE_FILE_ERROR: Si ocurrio un error al abrir el archivo de obras.
+// 	GENRES_FILE_ERROR: Si ocurrio un error al abrir el archivo de géneros.
+// 	RETURN_FILE_ERROR: Si ocurrio un error al abrir alguno de los archivos de retorno.
+// Si alguno de los archivo de retorno se logro abrir, este sera llenado con el query correspondiente.
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax);
 
 

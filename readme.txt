@@ -13,7 +13,7 @@ Contenido:
   	2) Ejecución del programa por consola
   	3) Salida del programa.
 
-1) Uso del makefile incluido:
+1) Uso del makeFile incluido:
 	Para utilizar el makeFile se debe tener instalado el programa make.
 	Se asume que la carpeta del proyecto fue descomprimida de el directorio ~/Desktop.
 	Para compilar el programa utilizando el comando make seguir los siguientes pasos:
@@ -24,31 +24,34 @@ Contenido:
 
 2) Ejecución del programa por consola:
 	Para llamar al programa se debe cambiar al directorio donde se encuentra el ejecutable IMDB.
-	Al llamar al programa se deben ingresar obligatoriamente dos parametros y opcionalmente se pueden agregar dos mas.
-	Parametros necesarios:
-		Los parametros necesarios son los paths a los archivos de obras y generos
-	
-
-
-
-  Para ejecutar el programa se deben utilizar las siguientes instrucciones en la Terminal:
-  a) Primero, ir a la carpeta del ejecutable. Suponiendo que el archivo comprimido se descargó en el escritorio, será:
-    cd ~/Desktop/IMDb
-  b) Luego, compilar el programa, si es necesario, utilizando el comando (2) (y opcionalmente el (3)) descriptos en la sección
-     2) de este archivo.
-  c) Finalmente, ejecutar el programa con la instrucción:
-    ./imdb path_a_archivo_csv path_a_archivo_generos
-  Ver que path_a_archivo_csv es la ruta hacia el archivo CSV a procesar y path_a_archivo_generos es la ruta al archivo donde
-  se encuentran los géneros de las obras a procesar.
-  El programa, por tanto, espera 2 parámetros con rutas a archivo válidas. Si el programa detecta menos de 2 argumentos abortará
-  la ejecución (mostrando un error adecuado), si detecta más de 2 argumentos, los sobrantes serán ignorados; y si las rutas a
-  archivos son inválidas también abortará (mostrando un error adecuado). Estos errores se detallan en la sección 6).
+    		(1) cd ~/Desktop/IMDB_DATA
+	Al llamar al programa se deben ingresar obligatoriamente dos parámetros y opcionalmente se pueden agregar dos mas.
+	Parámetros necesarios:
+	Los parámetros necesarios son los paths a los archivos de obras y géneros.
+		./imdb /PATH/ARCHIVO/OBRAS.csv /PATH/ARCHIVO/GÉNEROS.csv
+	Parámetros opcionales:
+	Opcionalmente se pueden agregar dos parámetros mas. Estos parámetros deben ser números naturales que representan el rango de años para los cuales se tomara encuentra títulos para los queries 4 y 5.
+	En el caso de no utilizar parámetros opcionales el query 4 y 5 tomaran en consideración todos los títulos.
+	En el caso de que se utilice un solo parámetro adicional, el query 4 y 5 analizaran series que hayan tenido al menos una temporada posterior al año introducido. En el siguiente ejemplo se consideran las series con temporadas que salieron después del año 2000:
+		./imdb /PATH/ARCHIVO/OBRAS.csv /PATH/ARCHIVO/GÉNEROS.csv 2000 
+	Si se utilizan dos parámetros opcionales, el query 4 y 5 analizaran series que hayan tenido al menos una temporada entre el rango de años introducido. En el siguiente ejemplo se consideran las series que sacaron alguna temporada entre los años 2000 y 2001:
+		./imdb /PATH/ARCHIVO/OBRAS.csv /PATH/ARCHIVO/GÉNEROS.csv 2000 2001
+	Nota: Si se introduce un numero decimal como año, se utilizara solamente la parte entera de ese numero.		
 
 3) Salida del programa:
-  El programa generará 3 archivos .csv, 1 por cada query solicitada:
-    a) query1.csv contiene la cantidad de películas, series y cortos por año.
-    b) query2.csv contiene el ranking de las 500 mejores películas animadas.
-    c) query3.csv contiene las 100 peliculas con mas votos de cada año.
-    d) query4.csv contiene las 250 series con mejor calificacion dentro de los limites de anios especificados
-    e) query5.csv contiene las 50 series con peor calificacion dentro de los limites de anios especificados
-  Estos archivos se encontrarán en el mismo directorio que el ejecutable anteriormente generado
+	El programa generará cinco archivos .csv, uno por cada query solicitada:
+		a) query1.csv contiene la cantidad de películas, series y cortos por año.
+    		b) query2.csv contiene el ranking de las 500 mejores películas animadas.
+    		c) query3.csv contiene las 100 películas con mas votos de cada año.
+    		d) query4.csv contiene las 250 series con mejor calificación dentro de los limites de años especificados
+    		e) query5.csv contiene las 50 series con peor calificación dentro de los limites de años especificados
+	Estos archivos se encontrarán en el mismo directorio que el ejecutable anteriormente generado.
+	El programa puede retornar una de las siguientes salidas:
+		0: Si no ocurrió ningún error.
+		1: Si hubo un error con los parámetros ingresados.
+		2: Si hubo un error de alocamiento de memoria.
+		3: Si hubo un error al abrir el archivo de obras.
+		4: Si hubo un error al abrir el archivo de géneros.
+		5: Si hubo un error al abrir alguno de los archivo de retorno.
+	Nota: Si alguno de los archivo de retorno se logro abrir, este sera llenado con el query correspondiente.
+
