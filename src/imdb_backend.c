@@ -158,7 +158,7 @@ static int compareRatingVotes(titleADT t1, titleADT t2);
 // Esta funcion compara dos titleADT segun su numero de votos. A igualdad de numero de votos se comparan los nombres de los titulos alfabeticamente.
 static int compareVotesNames(titleADT t1, titleADT t2);
 
-// Funcion de comparacion para el query 5. Llama a copmareRatingVotes, pero con los parametros de entrada cambiados de lugar.
+// Funcion de comparacion para el query 5. Llama a compareRatingVotes, pero con los parametros de entrada cambiados de lugar.
 static int compareQ5(titleADT t1, titleADT t2);
 
 
@@ -379,7 +379,7 @@ static int checkYearCondition(int startYear, int endYear, int yMin, int yMax){
 	if ((startYear >= yMin) && (startYear <= yMax)){					// La serie comenzo a publicarse dentro de los limites
 		return TRUE;
 	}
-	if ((endYear != NO_YEAR) && (endYear >= yMin) && (endYear <= yMax)){			// La serie tiene alguna temporada dentro de los limites
+	if ((endYear != NO_YEAR) && (endYear >= yMin) && (startYear <= yMax)){			// La serie tiene alguna temporada dentro de los limites
 		return TRUE;
 	}
 	if ((startYear <= yMax) && (endYear == NO_YEAR)){					// Siguen saliendo temporadas del titulo y la serie comenzo a salir antes del limite superior
@@ -578,7 +578,7 @@ static int compareVotesNames(titleADT t1, titleADT t2){
 	if ((c = compareNumVotes(t1, t2)) != 0){				// Comparacion por votos
 		return c;
 	} else {
-		return compareTitleNames(t1, t2);				// Comparacion por nombre
+		return compareTitleNames(t2, t1);				// Comparacion por nombre
 	}
 }
 
