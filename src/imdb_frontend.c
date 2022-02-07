@@ -224,7 +224,7 @@ static int readGenresFile(FILE * genresFile, allGenres * genres){
 	returnGenreName = fgets(genreName, GEN_LINE_MAX_CHARS, genresFile);						// Se lee la 1° línea del archivo
 
 	unsigned int nameLen;																	// Indica la longitud del género
-	while (returnGenreName != NULL){														// Si el archivo no esta vacío
+	while (returnGenreName != NULL && genres->dim < MAX_GENRES){														// Si el archivo no esta vacío
 		nameLen = strlen(genreName);														// Se guarda la longitud del género
 		genres->genresName[genres->dim] = malloc(sizeof(char) * nameLen + 1);				// Se reserva espacio para guardar el género
 		if (genres->genresName[genres->dim] == NULL){										// Si no de pudo reservar memoria
@@ -232,7 +232,7 @@ static int readGenresFile(FILE * genresFile, allGenres * genres){
 		}
 
 		strcpy(genres->genresName[genres->dim], genreName);									// Se guarda el género en la estructura
-		genres->genresName[genres->dim][--nameLen] = 0;										// Se coloca el 0 final (esto se hace para que no quede guardado con el "\N" y así evitar problemas a la hora de compararlos con los géneros de cada obra)
+		genres->genresName[genres->dim][--nameLen] = 0;										// Se coloca el 0 final (esto se hace para que no quede guardado con el "\n" y así evitar problemas a la hora de compararlos con los géneros de cada obra)
 
 		genres->nameLengths[genres->dim] = nameLen;											// Se guarda la longitud de ese género
 
