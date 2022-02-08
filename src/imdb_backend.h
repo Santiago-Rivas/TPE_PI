@@ -134,7 +134,8 @@ int nextTopSeries(queriesADT queries, titleADT title, int * flag);
 // Un 1 si lo pudo agregar, 0 si no pudo
 int nextWorstSeries(queriesADT queries, titleADT title,int * flag);
 
-// FUNCIONES DE RETORNO:
+// ****** FUNCIONES DE RETORNO *******
+
 // Funcion de retorno para el query 1
 // returnCurrentYearQ1 retorna la cantidad de films, series y shorts en el año en el cual apunta el iterador.
 // Recibe:

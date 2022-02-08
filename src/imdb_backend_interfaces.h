@@ -5,9 +5,9 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MAX_GENRES 32 		// Cantidad maxima de generos que se evaluaran
+#define MAX_GENRES 32 												// Cantidad maxima de generos que se evaluaran
 #define BLOCK 50
-#define NO_YEAR 0			// Constante que se usa cuando no se especifica un año
+#define NO_YEAR 0													// Constante que se usa cuando no se especifica un año
 #define NO_VALID_TYPE -1
 #define INVALID_INDEX -1
 #define Q2_GENRE_NAME "animation"
@@ -15,24 +15,24 @@
 #define TRUE 1
 #define FALSE 0
 
-enum titleType {MOVIE = 0, SHORT, TV_SERIES, TV_MINI_SERIES}; 	// Enum con los tipos de titulos que se pueden tener
+enum titleType {MOVIE = 0, SHORT, TV_SERIES, TV_MINI_SERIES}; 		// Enum con los tipos de titulos que se pueden tener
 
-typedef struct allGenres {		//Estructura con todos los generos
-	char ** genresName;			//Vector de strings de los generos
-	unsigned int * nameLengths; // Vector de enteros que indica la longitud de cada género
-	unsigned int dim;			//Dimension de los vectores
+typedef struct allGenres {											//Estructura con todos los generos
+	char ** genresName;												//Vector de strings de los generos
+	unsigned int * nameLengths; 									// Vector de enteros que indica la longitud de cada género
+	unsigned int dim;												//Dimension de los vectores
 } allGenres;
 
-typedef struct genreNode * genreList;	//Lista de generos de un titulo
+typedef struct genreNode * genreList;								//Lista de generos de un titulo
 
-typedef struct genreNode{	//Nodo de la lista de generos
-	char * genre;			//String de genero
-	genreList nextGenre;	//Puntero al siguiente nodo
+typedef struct genreNode{											//Nodo de la lista de generos
+	char * genre;													//String de genero
+	genreList nextGenre;											//Puntero al siguiente nodo
 }genreNode;
 
 typedef struct titleCDT * titleADT;	//ADT de obra
 
-titleADT newTitle(void);	//Crea una nueva estructura para pasar los datos a backend
+titleADT newTitle(void);											//Crea una nueva estructura para pasar los datos a backend
 
 // titleCopy copia todos los elementos del segundo titleADT en el primer titleADT
 int titleCopy(titleADT t1, titleADT t2);

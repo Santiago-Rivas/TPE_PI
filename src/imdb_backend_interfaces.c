@@ -82,20 +82,20 @@ genreList addGenres(genreList firstGenre, char * genreName, int * flag)
 
 // freeGenreList es una funcion que libera la memoria de listas de genreList
 void freeGenreList(genreList list){
-	if(list != NULL){								// Condicion para seguir avanzando
-		freeGenreList(list->nextGenre);				// Llamada recursiva para llegar al final de la lista
-		free(list->genre);							// Se libera el string que contiene el nombre del genero
-		free(list);									// Se libera el elemento actual de la lista
+	if(list != NULL){															// Condicion para seguir avanzando
+		freeGenreList(list->nextGenre);											// Llamada recursiva para llegar al final de la lista
+		free(list->genre);														// Se libera el string que contiene el nombre del genero
+		free(list);																// Se libera el elemento actual de la lista
 	}
 }
 
 // stringCompare compara dos strings ignorando mayusculas 
 int stringCompare(char * str1, char * str2){
-    int c = tolower(*str1) - tolower(*str2);				// Resta entre dos letras minusculas
-	if (*str1 != 0 && *str2 != 0 && c == 0){				// Ninguno de los strings se terminaron y las letras analizadas en esta recursion son la misma
-		return stringCompare(str1+1, str2+1);				// LLamada recursiva de la funcion para comparar las proximas letras
-	}
-	return c;												// Retorna la resta entre las letras que no son iguales
+    int c = tolower(*str1) - tolower(*str2);									// Resta entre dos letras minusculas
+	if (*str1 != 0 && *str2 != 0 && c == 0){									// Ninguno de los strings se terminaron y las letras analizadas en esta recursion son la misma
+		return stringCompare(str1+1, str2+1);									// LLamada recursiva de la funcion para comparar las proximas letras
+	}					
+	return c;																	// Retorna la resta entre las letras que no son iguales
 }
 
 // Funciones para modificar los campos de un titleADT:
@@ -130,16 +130,16 @@ void setGenres(titleADT title, allGenres * genres, genreList titleGenres){
 
 // setTitleName actualiza el campo primaryTitle, alocando la memoria necesaria para gaurdar el nombre del titulo
 int setTitleName(titleADT title, char * str){
-	int dim = strlen(str);															// Se encuentra la longitud del nombre del titulo
+	int dim = strlen(str);																// Se encuentra la longitud del nombre del titulo
 	if (dim > title->maxLen){
 		title->primaryTitle = realloc(title->primaryTitle, (dim + 1) * sizeof(char));	// Se aloca la memoria necesaria para copiar el nombre del titulo
 		title->maxLen = dim;
 	}
-	if (title->primaryTitle == NULL){												// Error de alocamiento
+	if (title->primaryTitle == NULL){													// Error de alocamiento
 		return FALSE;
 	}
-	strcpy(title->primaryTitle, str);												// Se copia el nombre del titulo al campo de la estructura titleADT
-	title->titleLen = dim;															// Se guarda la longitud del nombre del titulo en el titleADT
+	strcpy(title->primaryTitle, str);													// Se copia el nombre del titulo al campo de la estructura titleADT
+	title->titleLen = dim;																// Se guarda la longitud del nombre del titulo en el titleADT
 	return TRUE;
 }
 

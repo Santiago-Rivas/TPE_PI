@@ -159,63 +159,63 @@ static void printGenres(FILE * query, titleADT title, allGenres * genres, int pr
 
 
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){
-	FILE * genresFile = fopen(genresPath, "r");											// Se abre el archivo de generos
-	if (genresFile == NULL){															// Si no se pudo abrir
-		return GENRES_FILE_ERROR;														// Retorna que hubo un error en los archivos
+	FILE * genresFile = fopen(genresPath, "r");												// Se abre el archivo de generos
+	if (genresFile == NULL){																// Si no se pudo abrir
+		return GENRES_FILE_ERROR;															// Retorna que hubo un error en los archivos
 	}
 
-	FILE * titlesFile = fopen(titlePath, "r");											// Se abre el archivo de obras
-	if (titlesFile == NULL){															// Si no se pudo abrir
-		fclose(genresFile);																// Se cierra el archivo de generos que quedó abierto
-		return TITLE_FILE_ERROR;														// Retorna que hubo un error en los archivos
+	FILE * titlesFile = fopen(titlePath, "r");												// Se abre el archivo de obras
+	if (titlesFile == NULL){																// Si no se pudo abrir
+		fclose(genresFile);																	// Se cierra el archivo de generos que quedó abierto
+		return TITLE_FILE_ERROR;															// Retorna que hubo un error en los archivos
 	}
 
-	allGenres genres;																	// Se crea una estructura para guardar los géneros válidos
+	allGenres genres;																		// Se crea una estructura para guardar los géneros válidos
 
-	genres.genresName = calloc(1, sizeof(char *) * MAX_GENRES);							// Se crea espacio para guardar la cantidad máxima de géneros
-	if (genres.genresName == NULL){														// Si no se pudo reservar memoria
-		return ALLOC_ERROR;																// Retorna que hubo un error de alocamiento de memoria
+	genres.genresName = calloc(1, sizeof(char *) * MAX_GENRES);								// Se crea espacio para guardar la cantidad máxima de géneros
+	if (genres.genresName == NULL){															// Si no se pudo reservar memoria
+		return ALLOC_ERROR;																	// Retorna que hubo un error de alocamiento de memoria
 	}
-	genres.nameLengths = calloc(1, sizeof(unsigned int) * MAX_GENRES);					// Se crea espacio para guardar la longitud de cada género
-	if (genres.nameLengths == NULL){													// Si no se pudo reservar memoria
-		return ALLOC_ERROR;																// Retorna que hubo un error de alocamiento de memoria
+	genres.nameLengths = calloc(1, sizeof(unsigned int) * MAX_GENRES);						// Se crea espacio para guardar la longitud de cada género
+	if (genres.nameLengths == NULL){														// Si no se pudo reservar memoria
+		return ALLOC_ERROR;																	// Retorna que hubo un error de alocamiento de memoria
 	}
-	genres.dim = 0;																		// Inicializa la dimensión de los vectores en 0
+	genres.dim = 0;																			// Inicializa la dimensión de los vectores en 0
 
 	int check;
-	check = readGenresFile(genresFile, &genres);										// Lee el archivo de generos
+	check = readGenresFile(genresFile, &genres);											// Lee el archivo de generos
 
-	if (check == FALSE){																// Si hubo un error
-		freeAllGenres(&genres);															// Libera la estructura que utilizó para guardar los generos
-		return ALLOC_ERROR;																// Retorna que hubo un error de alocamiento de memoria
+	if (check == FALSE){																	// Si hubo un error
+		freeAllGenres(&genres);																// Libera la estructura que utilizó para guardar los generos
+		return ALLOC_ERROR;																	// Retorna que hubo un error de alocamiento de memoria
 	}
 
-	fclose(genresFile);																	// Cierra el archivo de géneros
+	fclose(genresFile);																		// Cierra el archivo de géneros
 
 	// Lectura de obras y llamada al backend
-	queriesADT queries = newQueries(yMin, yMax);										// Crea una estructura donde se almacena todo lo necesario para cada query
-	if (queries == NULL){																// Si hubo un error
-		fclose(titlesFile);																// Cierra el archivo de obras
-		return ALLOC_ERROR;																// Retorna que hubo un error de alocamiento de memoria
+	queriesADT queries = newQueries(yMin, yMax);											// Crea una estructura donde se almacena todo lo necesario para cada query
+	if (queries == NULL){																	// Si hubo un error
+		fclose(titlesFile);																	// Cierra el archivo de obras
+		return ALLOC_ERROR;																	// Retorna que hubo un error de alocamiento de memoria
 	}
 
-	check = readTitlesFile(titlesFile, queries, &genres);								// Lee el archivo de obras
-	if (check == FALSE){																// Si hubo un error
-		fclose(titlesFile);																// Cierra el archivo de obras
-		freeAllGenres(&genres);															// Libera la estructura utilizada para guardar los géneros válidos
-		freeQueries(queries);															// Libera la estructura donde se almacena todo lo necesario para cada query
-		return ALLOC_ERROR;																// Retorna que hubo un error de alocamiento de memoria
+	check = readTitlesFile(titlesFile, queries, &genres);									// Lee el archivo de obras
+	if (check == FALSE){																	// Si hubo un error
+		fclose(titlesFile);																	// Cierra el archivo de obras
+		freeAllGenres(&genres);																// Libera la estructura utilizada para guardar los géneros válidos
+		freeQueries(queries);																// Libera la estructura donde se almacena todo lo necesario para cada query
+		return ALLOC_ERROR;																	// Retorna que hubo un error de alocamiento de memoria
 	}
 
-	fclose(titlesFile);																	// Cierra el archivo de obras
+	fclose(titlesFile);																		// Cierra el archivo de obras
 	// Impresion de datos
 	
-	check = writeData(queries, &genres);												// Crea e imprime en los archivos de respuestas, los resultados de cada query
+	check = writeData(queries, &genres);													// Crea e imprime en los archivos de respuestas, los resultados de cada query
 
 	// Liberar memoria reservada
-	freeAllGenres(&genres);																// Libera la estructura utilizada para guardar los géneros válidos
-	freeQueries(queries);																// Libera la estructura donde se almacena todo lo necesario para cada query
-	return check;																		// Retorna si hubo un erro o no
+	freeAllGenres(&genres);																	// Libera la estructura utilizada para guardar los géneros válidos
+	freeQueries(queries);																	// Libera la estructura donde se almacena todo lo necesario para cada query
+	return check;																			// Retorna si hubo un erro o no
 }
 
 static int readGenresFile(FILE * genresFile, allGenres * genres){
@@ -256,19 +256,19 @@ static int readGenresFile(FILE * genresFile, allGenres * genres){
 }
 
 static void freeGenreNames(char ** nameVec,unsigned int dim){
-	for (int i = 0 ; i < dim ; i++){       			// Va desde 0 hasta la cantidad de generos de la obra
-		free(nameVec[i]);							// Libera cada string que contiene el nombre de cada genero
+	for (int i = 0 ; i < dim ; i++){       													// Va desde 0 hasta la cantidad de generos de la obra
+		free(nameVec[i]);																	// Libera cada string que contiene el nombre de cada genero
 	}
 }
 
 static void freeAllGenres(allGenres * genres){
-	if(genres->genresName != NULL){							// Si el vector de generos no esta vacío
-		freeGenreNames(genres->genresName,genres->dim);		// Libera todos los strings con los nombres de cada género que tenía la obra
-		free(genres->genresName);							// Libera el vector
-	}
-	if (genres->nameLengths != NULL)						// Si el vector que guarda la longitud de cada género no esta vacío					
-	{
-		free(genres->nameLengths);							// Se libera el vector
+	if(genres->genresName != NULL){															// Si el vector de generos no esta vacío
+		freeGenreNames(genres->genresName,genres->dim);										// Libera todos los strings con los nombres de cada género que tenía la obra
+		free(genres->genresName);															// Libera el vector
+	}								
+	if (genres->nameLengths != NULL)														// Si el vector que guarda la longitud de cada género no esta vacío					
+	{								
+		free(genres->nameLengths);															// Se libera el vector
 	}
 
 }
@@ -365,131 +365,131 @@ static int readTitle(char titleData[TITLE_LINE_MAX_CHARS], titleADT title, genre
 }
 
 static int getGenres(char * genresField, genreList * firstGenre){
-	char * genreStr;													// Se crea un string, donde se guarda cada género de la obra											
-	int check= TRUE;
-	genreStr = strtok(genresField, ",");								// Se obtiene un genero de la obra
-	while(genreStr != NULL){											// Mientras haya un género
-		(*firstGenre) = addGenres(*firstGenre, genreStr, &check);		// Se agrega a la lista de generos de la obra
-		if (check == FALSE){											// Si hubo un error
-			return FALSE;												// Retorna 0
-		}
-		genreStr = strtok(NULL, ",");									// Se obtiene el próximo género
-	}
-	return TRUE;														// Si no hubo errores, devuelve 1
+	char * genreStr;																		// Se crea un string, donde se guarda cada género de la obra											
+	int check= TRUE;					
+	genreStr = strtok(genresField, ",");													// Se obtiene un genero de la obra
+	while(genreStr != NULL){																// Mientras haya un género
+		(*firstGenre) = addGenres(*firstGenre, genreStr, &check);							// Se agrega a la lista de generos de la obra
+		if (check == FALSE){																// Si hubo un error
+			return FALSE;																	// Retorna 0
+		}					
+		genreStr = strtok(NULL, ",");														// Se obtiene el próximo género
+	}					
+	return TRUE;																			// Si no hubo errores, devuelve 1
 }
 
 static int getType(char * str){
 	
-	if (stringCompare(str, "movie") == 0){					// Compara el tipo de obra para ver si es un película
-		return MOVIE;										// Retorna un valor que indica que es una película
-	}
-	else if (stringCompare(str, "short") == 0){				// Compara el tipo de obra para ver si es un corto
-		return SHORT;										// Retorna un valor que indica que es una corto
-	}
-	else if (stringCompare(str, "tvseries") == 0){			// Compara el tipo de obra para ver si es un serie
-		return TV_SERIES;									// Retorna un valor que indica que es una serie
-	}
-	else if (stringCompare(str, "tvminiseries") == 0){		// Compara el tipo de obra para ver si es un mini serie
-		return TV_MINI_SERIES;								// Retorna un valor que indica que es una mini serie
-	}
-	else{
-		return NO_VALID_TYPE;								//Si la obra no coincide con ningun tipo, se devuelve -1
+	if (stringCompare(str, "movie") == 0){													// Compara el tipo de obra para ver si es un película
+		return MOVIE;																		// Retorna un valor que indica que es una película
+	}								
+	else if (stringCompare(str, "short") == 0){												// Compara el tipo de obra para ver si es un corto
+		return SHORT;																		// Retorna un valor que indica que es una corto
+	}								
+	else if (stringCompare(str, "tvseries") == 0){											// Compara el tipo de obra para ver si es un serie
+		return TV_SERIES;																	// Retorna un valor que indica que es una serie
+	}								
+	else if (stringCompare(str, "tvminiseries") == 0){										// Compara el tipo de obra para ver si es un mini serie
+		return TV_MINI_SERIES;																// Retorna un valor que indica que es una mini serie
+	}								
+	else{								
+		return NO_VALID_TYPE;																//Si la obra no coincide con ningun tipo, se devuelve -1
 	}
 }
 
 static int writeData(queriesADT queries, allGenres * genres){
-	FILE * fileId[TOTAL_QUERY_NUMBER] = {NULL};								// Se inicializa el vector de archivos de respuesta con todos los archivos en NULL
-	titleADT title = newTitle();											// Se crea una estructura, donde se almacenan los datos de la obra
-	if (title==NULL)														// Si no se pudo crear
-	{
-		return ALLOC_ERROR;													// Retorna que hubo un error de alocamiento de memoria
+	FILE * fileId[TOTAL_QUERY_NUMBER] = {NULL};												// Se inicializa el vector de archivos de respuesta con todos los archivos en NULL
+	titleADT title = newTitle();															// Se crea una estructura, donde se almacenan los datos de la obra
+	if (title==NULL)																		// Si no se pudo crear
+	{				
+		return ALLOC_ERROR;																	// Retorna que hubo un error de alocamiento de memoria
 	}
 	
 	char * returnFileNames[TOTAL_QUERY_NUMBER] = RETURN_FILE_NAMES;
 	char * returnFileHeaders[TOTAL_QUERY_NUMBER] = RETURN_FILE_HEADERS;
 	int fileCheck = EXIT_SUCCESS;
 
-	for (int i = 0 ; i < TOTAL_QUERY_NUMBER ; i++){							// Va desde 0 hasta la cantidad de archivos de respuesta
-		fileId[i] = fopen(returnFileNames[i], "wt");						// Se crean los archivos de respuesta
-		if(fileId[i] != NULL){												// Si se pudo crear
-			fprintf(fileId[i],"%s\n",returnFileHeaders[i]);					// Se imprimie el encabezado correspondiente
+	for (int i = 0 ; i < TOTAL_QUERY_NUMBER ; i++){											// Va desde 0 hasta la cantidad de archivos de respuesta
+		fileId[i] = fopen(returnFileNames[i], "wt");										// Se crean los archivos de respuesta
+		if(fileId[i] != NULL){																// Si se pudo crear
+			fprintf(fileId[i],"%s\n",returnFileHeaders[i]);									// Se imprimie el encabezado correspondiente
 		}
 		else{
-			fileCheck = RETURN_FILE_ERROR;											// Si no se pudo crear, en fileCheck se guarda que hubo un error de alocamiento
+			fileCheck = RETURN_FILE_ERROR;													// Si no se pudo crear, en fileCheck se guarda que hubo un error de alocamiento
 		}
 	}
 	
 	int check = TRUE;
 	
-	check = printYearlyQueries(fileId[Q1], fileId[Q3], queries, genres,title);  // Se imprimien en los archivos de respuesta, las queries que iteran por año juntas, para no recorres 2 veces la lista de años
-	if (check == FALSE)															// Si hubo un error
-	{
-		closeFileId(fileId);													// Se cierran los archivos abiertos
-		return ALLOC_ERROR;														// Se retorna que hubo un error de alocamiento
-	}
-	check = printQuery2(fileId[Q2] ,queries, genres,title);						// Se imprime en el archivo de respuesta el resultado del query 2
-	if (check == FALSE)															// Si hubo un error
-	{
-		closeFileId(fileId);													// Se cierran los archivos abiertos
-		return ALLOC_ERROR;														// Se retorna que hubo un error de alocamiento
-	}
-	check = printQuery4(fileId[Q4], queries,title);								// Se imprime en el archivo de respuesta el resultado del query 4
-	if (check == FALSE)															// Si hubo un error
-	{
-		closeFileId(fileId);													// Se cierran los archivos abiertos
-		return ALLOC_ERROR;														// Se retorna que hubo un error de alocamiento
-	}
-	check = printQuery5(fileId[Q5], queries, genres, title);					// Se imprime en el archivo de respuesta el resultado del query 5
-	if (check == FALSE)															// Si hubo un error
-	{
-		closeFileId(fileId);													// Se cierran los archivos abiertos
-		return ALLOC_ERROR;														// Se retorna que hubo un error de alocamiento
-	}
+	check = printYearlyQueries(fileId[Q1], fileId[Q3], queries, genres,title);  			// Se imprimien en los archivos de respuesta, las queries que iteran por año juntas, para no recorres 2 veces la lista de años
+	if (check == FALSE)																		// Si hubo un error
+	{			
+		closeFileId(fileId);																// Se cierran los archivos abiertos
+		return ALLOC_ERROR;																	// Se retorna que hubo un error de alocamiento
+	}			
+	check = printQuery2(fileId[Q2] ,queries, genres,title);									// Se imprime en el archivo de respuesta el resultado del query 2
+	if (check == FALSE)																		// Si hubo un error
+	{			
+		closeFileId(fileId);																// Se cierran los archivos abiertos
+		return ALLOC_ERROR;																	// Se retorna que hubo un error de alocamiento
+	}			
+	check = printQuery4(fileId[Q4], queries,title);											// Se imprime en el archivo de respuesta el resultado del query 4
+	if (check == FALSE)																		// Si hubo un error
+	{			
+		closeFileId(fileId);																// Se cierran los archivos abiertos
+		return ALLOC_ERROR;																	// Se retorna que hubo un error de alocamiento
+	}			
+	check = printQuery5(fileId[Q5], queries, genres, title);								// Se imprime en el archivo de respuesta el resultado del query 5
+	if (check == FALSE)																		// Si hubo un error
+	{			
+		closeFileId(fileId);																// Se cierran los archivos abiertos
+		return ALLOC_ERROR;																	// Se retorna que hubo un error de alocamiento
+	}			
 
-	freeTitle(title);															// Se libera la estructura utilizada para guardar los datos de cada obra
-	closeFileId(fileId);														// Se cierran los archivos que quedaron abiertos
-	return fileCheck;															// Retorna filecheck, que indica su hubo algún error o no	
+	freeTitle(title);																		// Se libera la estructura utilizada para guardar los datos de cada obra
+	closeFileId(fileId);																	// Se cierran los archivos que quedaron abiertos
+	return fileCheck;																		// Retorna filecheck, que indica su hubo algún error o no	
 }
 
 static void closeFileId(FILE * fileId[TOTAL_QUERY_NUMBER]){
-	for (int i = 0 ; i < TOTAL_QUERY_NUMBER ; i++){   			// Va desde 0 hasta la cantidad de archivos de respuesta
-		if (fileId[i] != NULL){									// Si el archivo de respuesta se pudo crear
-			fclose(fileId[i]);									// Se cierra el archivo
+	for (int i = 0 ; i < TOTAL_QUERY_NUMBER ; i++){   										// Va desde 0 hasta la cantidad de archivos de respuesta
+		if (fileId[i] != NULL){																// Si el archivo de respuesta se pudo crear
+			fclose(fileId[i]);																// Se cierra el archivo
 		}
 	}
 }
 
 static int printYearlyQueries(FILE * query1, FILE * query3, queriesADT queries, allGenres * genres,titleADT title)
 {
-	if(query1==NULL && query3==NULL)     							// Se verifica si los 2 archivos de respuesta que iteran por año se pudieron crear
-	{
-		return TRUE;												// Si ninguno se pudo crear, se retorna 1 y esos dos archivos de respuestas quedan vacios
-	}
-	toBeginYears(queries);											//Se inicializa el iterador por años
-	int hasYear=hasNextYear(queries);								// Se verifica si hay un elemento siguiente
-	int check;
-	while(hasYear){													// Mientras haya un elemento siguiente
-		if(query1 != NULL)											// Si el archivo de respuesta del query 1 se pudo crear
-		{
-			printQuery1(query1, queries);							// Se imprimie en el archivo de respuesta los resultados del query 1
-		}
-		if(query3 != NULL)											// Si el archivo de respuesta del query 1 se pudo crear
-		{
-			check=printQuery3(query3, queries, genres, title);      // Se imprimie en el archivo de respuesta los resultados del query 3
-			if(check == FALSE){										// Si check vale 0, entonces hubo un error
-				return FALSE;										// Si hubo un error, retorna 0
-			}
-		}
-		hasYear=nextYear(queries);									// Se verifica que haya un elemento siguiente
-	}
-	return TRUE;													// Si no hubo errores, retorna 1
+	if(query1==NULL && query3==NULL)     													// Se verifica si los 2 archivos de respuesta que iteran por año se pudieron crear
+	{						
+		return TRUE;																		// Si ninguno se pudo crear, se retorna 1 y esos dos archivos de respuestas quedan vacios
+	}						
+	toBeginYears(queries);																	//Se inicializa el iterador por años
+	int hasYear=hasNextYear(queries);														// Se verifica si hay un elemento siguiente
+	int check;						
+	while(hasYear){																			// Mientras haya un elemento siguiente
+		if(query1 != NULL)																	// Si el archivo de respuesta del query 1 se pudo crear
+		{						
+			printQuery1(query1, queries);													// Se imprimie en el archivo de respuesta los resultados del query 1
+		}						
+		if(query3 != NULL)																	// Si el archivo de respuesta del query 1 se pudo crear
+		{						
+			check=printQuery3(query3, queries, genres, title);      						// Se imprimie en el archivo de respuesta los resultados del query 3
+			if(check == FALSE){																// Si check vale 0, entonces hubo un error
+				return FALSE;																// Si hubo un error, retorna 0
+			}						
+		}						
+		hasYear=nextYear(queries);															// Se verifica que haya un elemento siguiente
+	}						
+	return TRUE;																			// Si no hubo errores, retorna 1
 }
 
 static void printQuery1(FILE * query1, queriesADT queries)
 {
 	unsigned int year,nFilms,nSeries,nShorts;
-	returnCurrentYearQ1(queries,&year,&nFilms,&nSeries,&nShorts);		//En year,nFilms,nSeries,nShorts se ponen el año, la cantidad de peliculas, de series y de cortos respectivamente
-	fprintf(query1,"%d;%d;%d;%d\n",year,nFilms,nSeries,nShorts);		// Se imprime el resultado de la query en el archivo de respuesta
+	returnCurrentYearQ1(queries,&year,&nFilms,&nSeries,&nShorts);							//En year,nFilms,nSeries,nShorts se ponen el año, la cantidad de peliculas, de series y de cortos respectivamente
+	fprintf(query1,"%d;%d;%d;%d\n",year,nFilms,nSeries,nShorts);							// Se imprime el resultado de la query en el archivo de respuesta
 }
 
 static int printQuery2(FILE * query2, queriesADT queries, allGenres * genres, titleADT title)
@@ -560,55 +560,55 @@ static int printTitle(FILE * query,titleADT title)
 {
 	char * str = NULL;
 	int check;
-	check = returnTitleName(title,&str);        // En str queda una copia del titulo de la obra
-	if(check == FALSE)							// Si check es FALSE, entonces hubo un error
-	{
-		return FALSE;   
-	}
-	fprintf(query,"%s",str);					// Se imprime en el archivo de respuesta el titulo de la obra
-	free(str);									// Se libera el string que se uso para guardar el titulo
+	check = returnTitleName(title,&str);       				// En str queda una copia del titulo de la obra
+	if(check == FALSE)										// Si check es FALSE, entonces hubo un error
+	{		
+		return FALSE;   		
+	}		
+	fprintf(query,"%s",str);								// Se imprime en el archivo de respuesta el titulo de la obra
+	free(str);												// Se libera el string que se uso para guardar el titulo
 	return TRUE;
 }
 
 static void printStartYear(FILE * query, titleADT title){
-	fprintf(query, "%d", returnStartYear(title));  		// Imprime en el archivo el año de comienzo de la obra
+	fprintf(query, "%d", returnStartYear(title));  			// Imprime en el archivo el año de comienzo de la obra
 }
 
 static void printEndYear(FILE * query, titleADT title){
-	int year = returnEndYear(title);  			// En year se guarda el año de finalización de la obra
-	if (year <= NO_YEAR){						// Si no es un año válido
-		fprintf(query, NO_ELEM_STR2);			// Se imprime en el archivo de respuesta un "\N" en el campo del año de finalización
+	int year = returnEndYear(title);  						// En year se guarda el año de finalización de la obra
+	if (year <= NO_YEAR){									// Si no es un año válido
+		fprintf(query, NO_ELEM_STR2);						// Se imprime en el archivo de respuesta un "\N" en el campo del año de finalización
 	} else{
-		fprintf(query, "%d", year); 			// En cambio, is el año es válido se imprime ese año en el archivo de respuesta
+		fprintf(query, "%d", year); 						// En cambio, is el año es válido se imprime ese año en el archivo de respuesta
 	}
 }
 
 static void printVotes(FILE * query, titleADT title){
-	fprintf(query, "%d", returnVotes(title));        // Imprime en el archivo la cantidad de votos de la obra
+	fprintf(query, "%d", returnVotes(title));        		// Imprime en el archivo la cantidad de votos de la obra
 }
 
 static void printRating(FILE * query, titleADT title){
-	fprintf(query, "%0.1f", returnRating(title));  // Imprime en el archivo el rating de la obra
+	fprintf(query, "%0.1f", returnRating(title));  			// Imprime en el archivo el rating de la obra
 }
 
 static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations){
-	int dim = returnGenCount(title);    																				// En dim se guarda la cantidad de generos de la obra
+	int dim = returnGenCount(title);    																			// En dim se guarda la cantidad de generos de la obra
 	int i;
-	int addCounter = 0;																									// Indica la cantidad de géneros que se agregaron
+	int addCounter = 0;																								// Indica la cantidad de géneros que se agregaron
 	int genreNum;
-	for (i = 0 ; i < dim ; i++){																						// Va desde 0 hasta la cantidad de generos de esa obra
-		genreNum = returnGenre(title, i);																				// Se guarda en genreNum la dimensión del arreglo con los generos de cada obra
-		if (((printAnimations == TRUE) || (stringCompare(genres->genresName[genreNum], Q2_GENRE_NAME) != 0))){			// Se verifica si hay que imprimir o no el género "animation"
-			if (addCounter != 0){																						// Si no es el 1° género que se agrega
-				fprintf(query, ",");																					// Imprime en el archivo de respuesta una coma (que separa cada género)
+	for (i = 0 ; i < dim ; i++){																					// Va desde 0 hasta la cantidad de generos de esa obra
+		genreNum = returnGenre(title, i);																			// Se guarda en genreNum la dimensión del arreglo con los generos de cada obra
+		if (((printAnimations == TRUE) || (stringCompare(genres->genresName[genreNum], Q2_GENRE_NAME) != 0))){		// Se verifica si hay que imprimir o no el género "animation"
+			if (addCounter != 0){																					// Si no es el 1° género que se agrega
+				fprintf(query, ",");																				// Imprime en el archivo de respuesta una coma (que separa cada género)
 			}
 			
-			fprintf(query, "%s", genres->genresName[genreNum]);															// Imprime el género en el archivo de respuesta							
-			addCounter++;																								// Incrementa el contador de géneros
+			fprintf(query, "%s", genres->genresName[genreNum]);														// Imprime el género en el archivo de respuesta							
+			addCounter++;																							// Incrementa el contador de géneros
 		}
 	}
-	if (addCounter == 0){																								// Si no hay ningún género
-		fprintf(query, NO_ELEM_STR2);																					// Se imprime en el archivo de respuesta el indicador de campo vacío (\N)
+	if (addCounter == 0){																							// Si no hay ningún género
+		fprintf(query, NO_ELEM_STR2);																				// Se imprime en el archivo de respuesta el indicador de campo vacío (\N)
 	}
 }
 
