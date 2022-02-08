@@ -65,7 +65,7 @@ enum queries {Q1 = 0,Q2,Q3,Q4,Q5};		// Indice orotgado a cada query
 //	yMax: Año maxim en el cual se consideraran series para el query 4 y 5
 //	El año NO_YEAR indica que no se ingreso el parametro cuando se llamo al programa
 // La funcion retorna:
-// 	TRUE: Si no hubo errores.
+// 	EXIT_SUCCESS: Si no hubo errores.
 // 	ALLOC_ERROR: Si ocurrio un error de alocamiento.
 // 	TITLE_FILE_ERROR: Si ocurrio un error al abrir el archivo de obras.
 // 	GENRES_FILE_ERROR: Si ocurrio un error al abrir el archivo de géneros.

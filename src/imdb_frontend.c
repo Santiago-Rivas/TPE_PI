@@ -55,7 +55,7 @@ static int getType(char * str);
 // queries: puntero a la estructura donde se almacena lo necesario para cada query
 // genres: puntero a la estructura con la lista de generos válidos
 // Parametros de Salida:
-// Retorna un entero según el tipo de error, o 0 si no hubo errores
+// Retorna un entero según el tipo de error, o EXIT_SUCCESS si no hubo errores
 static int writeData(queriesADT queries, allGenres * genres);
 
 // closeFileId se encarga de cerrar los archivos de respuesta
@@ -155,7 +155,7 @@ static void printRating(FILE * query, titleADT title);
 static void printGenres(FILE * query, titleADT title, allGenres * genres, int printAnimations);
 
 
-/// Funciones ///
+///////////////////////////////////////////////////// Funciones /////////////////////////////////////////////////////
 
 
 int imdb_frontend_main(char * titlePath, char * genresPath, unsigned int yMin, unsigned int yMax){

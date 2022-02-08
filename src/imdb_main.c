@@ -17,7 +17,12 @@ static int validatePath(char * path);
 // Retorna TRUE si el año es un número y FALSE si no lo es 	
 static int validateYear(char * year);
 
+//Función de bienvenida
+static void welcome();
+
 int main( int argc, char *argv[] )  {
+	welcome();																		// Mensaje de bienvenida
+
 	if( argc < MIN_ARG + 1 ) {                                  					// Se verifica que haya una mínima cantidad de argumentos
 		fprintf(stderr, "Error: Muy pocos argumentos\n");
 		return INPUT_ERROR;
@@ -60,11 +65,10 @@ int main( int argc, char *argv[] )  {
 	}
 
 	check = imdb_frontend_main(argv[1], argv[2], yMin, yMax);
-	
 	switch(check)
 	{
-		case TRUE: 
-			return EXIT_SUCCESS;
+		case EXIT_SUCCESS: 
+			puts("El programa ha terminado de ejecutar exitosamente!");
 			break;
 
 		case ALLOC_ERROR: 		
@@ -109,5 +113,21 @@ static int validateYear(char * year){
         return TRUE;													// Si son todos dígitos, retorna TRUE
 }
 
+static void welcome()
+{
+	putchar('\n');
+	puts("██╗███╗   ███╗██████╗ ██████╗   ");
+    puts("██║████╗ ████║██╔══██╗██╔══██╗  ");
+    puts("██║██╔████╔██║██║  ██║██████╔╝  ");
+    puts("██║██║╚██╔╝██║██║  ██║██╔══██╗  ");
+    puts("██║██║ ╚═╝ ██║██████╔╝██████╔╝  ");
+    puts("╚═╝╚═╝     ╚═╝╚═════╝ ╚═════╝   ");
 
+    putchar('\n');
+    puts("Grupo conformado por:");
+    puts(" *  Busso, Thomas, 62519");
+    puts(" *  Rivas, Santiago, 61007");
+    putchar('\n');
+    puts("Espere un momento...");
+}
 

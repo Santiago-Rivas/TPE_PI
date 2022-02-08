@@ -270,7 +270,7 @@ int processData(queriesADT queries, titleADT title, genreList titleGenres, allGe
 static pElement newCurrentElement(unsigned int maxId){			
 	pElement new = malloc(sizeof(tElement));									// Alocamiento de memoria
 	if (new == NULL){
-		return NULL;
+		return NULL;															
 	}
 	new->title = newTitle();													// Se crea un nuevo titleADT y se lo asigna
 	if (new->title == NULL){
@@ -677,7 +677,7 @@ int nextYear(queriesADT queries){
 		return TRUE; 																// Retorna el puntero al elemento al año actual
 	}
 	else {
-		return FALSE;																// Si no quedan mas años retorna NULL
+		return FALSE;																// Si no quedan mas años retorna FALSE
 	}
 }
 
@@ -696,7 +696,7 @@ int nextTopAnimatedFilms(queriesADT queries,titleADT title, int *flag){
 		*flag = nextItem(&(queries->topAnimatedFilmsIterator),title);			
 		return *flag;
 	}
-	return FALSE;																	// Si no quedan mas elementos en el ranking retorn NULL
+	return FALSE;																	// Si no quedan mas elementos en el ranking retorna FALSE
 }
 
 // Iterador para las mejores series (query 4)
@@ -763,4 +763,3 @@ void freeQueries(queriesADT queries){
 	freeElement(queries->currentElement);											// Se libara el currentElement si es necesario
 	free(queries);																	// Se libara queries
 }
-
