@@ -103,7 +103,7 @@ static int validatePath(char * path){ 									//Devuelve false si el path conti
 
 static int validateYear(char * year){
         for (int i = 0 ; year[i] != 0 ; i++){							// Recorre cada dígito del año
-                if (isdigit(year[i]) == 0){								// Si no es un dígito
+                if (isdigit(year[i]) == 0)								// Si no es un dígito
                         return FALSE;                                   // Retorna FLASE                                                                                                      }
         }
         return TRUE;													// Si son todos dígitos, retorna TRUE
